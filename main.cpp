@@ -4,12 +4,43 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 
-void beginGameSequence(sf::RenderWindow* window)
+void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 {
+    window->clear(sf::Color::White);
+    sf::Texture head;
+    if(!head.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png"))
+    {
+        std::cout << "Head unable to load" << std::endl; 
+    }
+    sf::Sprite head_sprite;
+    head_sprite.setTexture(head);
+    //head_sprite.setTextureRect(sf::IntRect(-100, -100, 100, 100));
+
     while (1)
     {
-    window->clear(sf::Color::White);
-    window->display();
+        window->clear(sf::Color::White);
+        std::cout << head_sprite.getPosition().x << std::endl;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            std::cout << "Right key pressed" << std::endl;
+            // left key is pressed: move our character
+            head_sprite.move(0.1f, 0.f);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            head_sprite.move(-0.1f, 0.f);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            head_sprite.move(0.f, -0.1f);
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            head_sprite.move(0.f, 0.1f);
+        }
+        
+        window->draw(head_sprite);
+        window->display();
     }
 }
 
@@ -40,7 +71,7 @@ int main()
                 if (event.key.code == sf::Keyboard::Enter)
                 {
                     std::cout << "Enter key pressed" << std::endl;
-                    beginGameSequence(&window);
+                    beginGameSequence(&window, &event);
                 }
             }
         }
