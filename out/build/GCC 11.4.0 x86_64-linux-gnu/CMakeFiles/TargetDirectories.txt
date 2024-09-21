@@ -1,0 +1,3 @@
+/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/out/build/GCC 11.4.0 x86_64-linux-gnu/CMakeFiles/Lab1.dir
+/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/out/build/GCC 11.4.0 x86_64-linux-gnu/CMakeFiles/edit_cache.dir
+/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/out/build/GCC 11.4.0 x86_64-linux-gnu/CMakeFiles/rebuild_cache.dir
