@@ -36,6 +36,24 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     sf::Color bg(10,24,26);
     boost::random::mt19937 rng;
     boost::random::uniform_int_distribution<> four_steps(-10, 10);
+    boost::random::uniform_int_distribution<> mushroom_pos_x(0, WINDOW_WIDTH);
+    boost::random::uniform_int_distribution<> mushroom_pos_y(0, WINDOW_HEIGHT);
+
+    // load mushroom
+    sf::Texture mushroom_tex;
+    if(!mushroom_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png"))
+    {
+        std::cout << "Head unable to mushroom0" << std::endl; 
+    }
+    sf::Sprite mushrooms[30];
+    for(int i=0; i<30; i++)
+    {
+        mushrooms[i] = sf::Sprite(mushroom_tex);
+        mushrooms[i].setPosition(mushroom_pos_x(rng), mushroom_pos_y(rng));
+        window->draw(mushrooms[i]);
+    }
+    starship.setTexture(starship_tex);
+
     int c = 0;
     while (1)
     {
@@ -86,6 +104,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         
         window->draw(starship);
         window->draw(spider);
+        for(int i=0; i<30; i++)
+        {
+            window->draw(mushrooms[i]);
+        }
         window->display();
     }
 }
