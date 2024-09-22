@@ -5,6 +5,7 @@
 #include <iostream>
 #include <time.h>
 #include <algorithm>
+#include <boost/random.hpp>
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
@@ -32,31 +33,37 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     spider.setTexture(spider_tex);
     spider.setPosition(900, 400);
 
-    sf::Color bg(12,26,30);
+    sf::Color bg(10,24,26);
+    boost::random::mt19937 rng;
+    boost::random::uniform_int_distribution<> four_steps(-10, 10);
+    int c = 0;
     while (1)
     {
         window->clear(bg);
         
         // move spider randomly
-        int next_spider_move = rand() % 4;
-        std::cout << next_spider_move << std::endl;
-        switch (next_spider_move)
-        {
-        case 0:
-            spider.move(0.1, 0);
-            break;
-        case 1:
-            spider.move(-0.1, 0);
-        case 2:
-            spider.move(0, -0.1);
-        case 3:
-            spider.move(0, 0.1);
         
-        default:
-            break;
-        }
+        // switch (next_spider_move)
+        // {
+        // case 0:
+        //     spider.move(0.1, 0);
+        //     break;
+        // case 1:
+        //     spider.move(-0.1, 0);
+        // case 2:
+        //     spider.move(0, 0.0);
+        // case 3:
+        //     spider.move(0, -0.0);
+        
+        // default:
+        //     break;
+        // }
 
-        spider.setPosition(std::max(std::min((float)WINDOW_WIDTH-48, spider.getPosition().x), 0.f), std::max(std::min((float)WINDOW_HEIGHT-29, spider.getPosition().y), 0.f));
+        int move = four_steps(rng);
+        std::cout << move << std::endl;
+        spider.move(0.1*four_steps(rng), 0.1*four_steps(rng));
+
+        spider.setPosition(std::max(std::min((float)WINDOW_WIDTH-48, spider.getPosition().x), 0.f), std::max(std::min((float)WINDOW_HEIGHT-29, spider.getPosition().y), 330.f));
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
