@@ -3,51 +3,91 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
 #include <iostream>
+#include <time.h>
+#include <algorithm>
+
+const int WINDOW_WIDTH = 1036;
+const int WINDOW_HEIGHT = 569;
 
 void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 {
     window->clear(sf::Color::White);
-    sf::Texture head;
-    if(!head.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png"))
-    {
-        std::cout << "Head unable to load" << std::endl; 
-    }
-    sf::Sprite head_sprite;
-    head_sprite.setTexture(head);
-    //head_sprite.setTextureRect(sf::IntRect(-100, -100, 100, 100));
 
+    // load starship
+    sf::Texture starship_tex;
+    if(!starship_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
+    {
+        std::cout << "Head unable to starship" << std::endl; 
+    }
+    sf::Sprite starship;
+    starship.setTexture(starship_tex);
+
+    // load spider
+    sf::Texture spider_tex;
+    if(!spider_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/spider.png"))
+    {
+        std::cout << "Head unable to spider" << std::endl; 
+    }
+    sf::Sprite spider;
+    spider.setTexture(spider_tex);
+    spider.setPosition(900, 400);
+
+    sf::Color bg(12,26,30);
     while (1)
     {
-        window->clear(sf::Color::White);
-        std::cout << head_sprite.getPosition().x << std::endl;
+        window->clear(bg);
+        
+        // move spider randomly
+        int next_spider_move = rand() % 4;
+        std::cout << next_spider_move << std::endl;
+        switch (next_spider_move)
+        {
+        case 0:
+            spider.move(0.1, 0);
+            break;
+        case 1:
+            spider.move(-0.1, 0);
+        case 2:
+            spider.move(0, -0.1);
+        case 3:
+            spider.move(0, 0.1);
+        
+        default:
+            break;
+        }
+
+        spider.setPosition(std::max(std::min((float)WINDOW_WIDTH-48, spider.getPosition().x), 0.f), std::max(std::min((float)WINDOW_HEIGHT-29, spider.getPosition().y), 0.f));
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
             std::cout << "Right key pressed" << std::endl;
             // left key is pressed: move our character
-            head_sprite.move(0.1f, 0.f);
+            starship.move(0.1f, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            head_sprite.move(-0.1f, 0.f);
+            starship.move(-0.1f, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            head_sprite.move(0.f, -0.1f);
+            starship.move(0.f, -0.1f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            head_sprite.move(0.f, 0.1f);
+            starship.move(0.f, 0.1f);
         }
         
-        window->draw(head_sprite);
+        window->draw(starship);
+        window->draw(spider);
         window->display();
     }
 }
 
 int main()
 {   
+    srand(time(NULL));
     // create the window
-    sf::RenderWindow window(sf::VideoMode(1036, 569), "My window");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
 
     // run the program as long as the window is open
     while (window.isOpen())
