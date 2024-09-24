@@ -6,12 +6,14 @@
 #include <time.h>
 #include <algorithm>
 #include <boost/random.hpp>
+#include <list>
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
 
 void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 {
+    window->setKeyRepeatEnabled(false);
     window->clear(sf::Color::White);
 
     // load starship
@@ -22,6 +24,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     }
     sf::Sprite starship;
     starship.setTexture(starship_tex);
+    starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
 
     // load spider
     sf::Texture spider_tex;
@@ -53,39 +56,83 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         window->draw(mushrooms[i]);
     }
     starship.setTexture(starship_tex);
+    int move = four_steps(rng);
 
     int c = 0;
+
+    // load laser
+    sf::Texture laser_tex;
+    if(!laser_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20)))
+    {
+        std::cout << "Head unable to laser" << std::endl;
+    }
+    std::list <sf::Sprite> lasers;
+    std::list<sf::Sprite>::iterator laser_it;
+
     while (1)
     {
         window->clear(bg);
-        
-        // move spider randomly
-        
-        // switch (next_spider_move)
-        // {
-        // case 0:
-        //     spider.move(0.1, 0);
-        //     break;
-        // case 1:
-        //     spider.move(-0.1, 0);
-        // case 2:
-        //     spider.move(0, 0.0);
-        // case 3:
-        //     spider.move(0, -0.0);
-        
-        // default:
-        //     break;
-        // }
-
-        int move = four_steps(rng);
-        std::cout << move << std::endl;
+    
         spider.move(0.1*four_steps(rng), 0.1*four_steps(rng));
 
         spider.setPosition(std::max(std::min((float)WINDOW_WIDTH-48, spider.getPosition().x), 0.f), std::max(std::min((float)WINDOW_HEIGHT-29, spider.getPosition().y), 330.f));
 
+        sf::Event event;
+        while (window->pollEvent(event))
+        {
+            // check the type of the event...
+            switch (event.type)
+            {
+                // window closed
+                case sf::Event::Closed:
+                    window->close();
+                    break;
+
+                // key pressed
+                case sf::Event::KeyPressed:
+                    if (event.type == sf::Event::KeyPressed)
+                    {
+                        if (event.key.code == sf::Keyboard::Space)
+                        {
+                            lasers.push_back(sf::Sprite(laser_tex));
+                            lasers.back().setPosition(starship.getPosition());   
+                        }
+
+                        else if (event.key.code == sf::Keyboard::Right)
+                        {
+                            //std::cout << "Right key pressed" << std::endl;
+                            // left key is pressed: move our character
+                            starship.move(0.1f, 0.f);
+                        }
+                        else if (event.key.code == sf::Keyboard::Left)
+                        {
+                            starship.move(-0.1f, 0.f);
+                        }
+                        else if (event.key.code == sf::Keyboard::Up)
+                        {
+                            starship.move(0.f, -0.1f);
+                        }
+                        else if (event.key.code == sf::Keyboard::Down)
+                        {
+                            starship.move(0.f, 0.1f);
+                        }
+                    }
+                    break;
+
+                // we don't process other types of events
+                default:
+                    break;
+            }
+        }
+        // if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        // {
+        //     lasers.push_back(sf::Sprite(laser_tex));
+        //     lasers.back().setPosition(starship.getPosition());
+        // }
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
-            std::cout << "Right key pressed" << std::endl;
+            //std::cout << "Right key pressed" << std::endl;
             // left key is pressed: move our character
             starship.move(0.1f, 0.f);
         }
@@ -102,12 +149,22 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             starship.move(0.f, 0.1f);
         }
         
-        window->draw(starship);
-        window->draw(spider);
+        int co = 1;
+        for(laser_it=lasers.begin(); laser_it!=lasers.end(); ++laser_it)
+        {
+            if((*laser_it).getPosition().y > 0)
+            {
+                (*laser_it).move(0.f, -0.1f);
+                window->draw(*laser_it);
+            }
+        }
+
         for(int i=0; i<30; i++)
         {
             window->draw(mushrooms[i]);
         }
+        window->draw(starship);
+        window->draw(spider);
         window->display();
     }
 }
