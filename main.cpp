@@ -48,13 +48,57 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     {
         std::cout << "Head unable to mushroom0" << std::endl; 
     }
-    sf::Sprite mushrooms[30];
-    for(int i=0; i<30; i++)
+    const int NUMBER_OF_MUSHROOMS = 30;
+    // sf::Sprite mushrooms[NUMBER_OF_MUSHROOMS];
+    // int mushroom_coords[NUMBER_OF_MUSHROOMS][3]; // [x, y, heath]
+    // for(int i=0; i<30; i++)
+    // {
+    //     mushrooms[i] = sf::Sprite(mushroom_tex);
+    //     int m_x = mushroom_pos_x(rng);
+    //     int m_y = mushroom_pos_y(rng);
+    //     mushrooms[i].setPosition(m_x, m_y);
+    //     mushroom_coords[i][0] = m_x;
+    //     mushroom_coords[i][1] = m_y;
+    //     mushroom_coords[i][2] = 2; // mushroom health: 2 (full), 1 (half), 0 (dead)
+    //     window->draw(mushrooms[i]);
+    // }
+
+    sf::Texture MUSHROOM_HEALTH_2_TEX;
+    if(!MUSHROOM_HEALTH_2_TEX.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png"))
     {
-        mushrooms[i] = sf::Sprite(mushroom_tex);
-        mushrooms[i].setPosition(mushroom_pos_x(rng), mushroom_pos_y(rng));
-        window->draw(mushrooms[i]);
+        std::cout << "Head unable to health 2 mushroom" << std::endl; 
     }
+
+    sf::Texture MUSHROOM_HEALTH_1_TEX;
+    if(!MUSHROOM_HEALTH_1_TEX.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom1.png"))
+    {
+        std::cout << "Head unable to health 1 mushroom" << std::endl; 
+    }
+
+    struct mushroom_obj
+    {
+        sf::Sprite obj;
+        int x;
+        int y;
+        int health;
+        sf::IntRect collisionBox;
+    };
+
+    const int MAX_MUSHROOM_COUNT = 30;
+    mushroom_obj mushrooms[MAX_MUSHROOM_COUNT];
+    for (int i=0; i<MAX_MUSHROOM_COUNT; i++)
+    {
+        mushrooms[i].obj = sf::Sprite(MUSHROOM_HEALTH_2_TEX);
+        mushrooms[i].x = mushroom_pos_x(rng);
+        mushrooms[i].y = mushroom_pos_y(rng);
+        mushrooms[i].health = 2;
+        mushrooms[i].obj.setPosition(mushrooms[i].x, mushrooms[i].y);
+        mushrooms[i].collisionBox = sf::IntRect(mushrooms[i].x-10, mushrooms[i].y-10, 35, 35);
+    }
+
+    
+    
+
     starship.setTexture(starship_tex);
     int move = four_steps(rng);
 
@@ -68,6 +112,12 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     }
     std::list <sf::Sprite> lasers;
     std::list<sf::Sprite>::iterator laser_it;
+
+    sf::Texture new_laser_tex;
+    if(!new_laser_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/violet-neon.jpg", sf::IntRect(10, 10, 3, 20)))
+    {
+        std::cout << "No new laser" << std::endl;
+    }
 
     while (1)
     {
@@ -97,25 +147,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                             lasers.push_back(sf::Sprite(laser_tex));
                             lasers.back().setPosition(starship.getPosition());   
                         }
-
-                        else if (event.key.code == sf::Keyboard::Right)
-                        {
-                            //std::cout << "Right key pressed" << std::endl;
-                            // left key is pressed: move our character
-                            starship.move(0.1f, 0.f);
-                        }
-                        else if (event.key.code == sf::Keyboard::Left)
-                        {
-                            starship.move(-0.1f, 0.f);
-                        }
-                        else if (event.key.code == sf::Keyboard::Up)
-                        {
-                            starship.move(0.f, -0.1f);
-                        }
-                        else if (event.key.code == sf::Keyboard::Down)
-                        {
-                            starship.move(0.f, 0.1f);
-                        }
                     }
                     break;
 
@@ -124,11 +155,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                     break;
             }
         }
-        // if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        // {
-        //     lasers.push_back(sf::Sprite(laser_tex));
-        //     lasers.back().setPosition(starship.getPosition());
-        // }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
@@ -152,8 +178,29 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         int co = 1;
         for(laser_it=lasers.begin(); laser_it!=lasers.end(); ++laser_it)
         {
-            if((*laser_it).getPosition().y > 0)
+            int l_x = (*laser_it).getPosition().x;
+            int l_y = (*laser_it).getPosition().y;
+
+            if(l_y > 0)
             {
+                for (int i=0; i < NUMBER_OF_MUSHROOMS; i++)
+                {
+                    if (mushrooms[i].collisionBox.contains(l_x, l_y) and mushrooms[i].health > 0)
+                    {
+                        mushrooms[i].health--;
+                        mushrooms[i].obj.setTexture(MUSHROOM_HEALTH_1_TEX); 
+                        (*laser_it).setPosition(-10, -10); // laser positioned out of window
+                    }
+                    // if ((mushrooms[i].x == l_x) && (mushrooms[i].y == l_y) && (mushrooms[i].health > 0))
+                    // {
+                    //     (*laser_it).move(0.f, WINDOW_HEIGHT + 100); // laser positioned out of window
+                    //     mushrooms[i].health--;
+                    // }
+                }
+                if(l_y < 200)
+                {
+                    (*laser_it).setTexture(new_laser_tex);
+                }
                 (*laser_it).move(0.f, -0.1f);
                 window->draw(*laser_it);
             }
@@ -161,7 +208,15 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
         for(int i=0; i<30; i++)
         {
-            window->draw(mushrooms[i]);
+            if(mushrooms[i].health > 0)
+            {
+                // if(mushrooms[i].health == 1)
+                // {
+                //     mushrooms[i].obj.setTexture(MUSHROOM_HEALTH_1_TEX);
+                // }
+                window->draw(mushrooms[i].obj);
+
+            }
         }
         window->draw(starship);
         window->draw(spider);
