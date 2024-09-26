@@ -28,11 +28,13 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     {
         sf::Sprite obj;
         sf::IntRect collisionBox;
+        int health;
     };
     starship_obj starship;
     starship.obj.setTexture(starship_tex);
     starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
     starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
+    starship.health = 3;
 
     // load spider
     sf::Texture spider_tex;
@@ -61,7 +63,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     spider.target_x = (rand() % (WINDOW_WIDTH - 20 + 1));
     spider.target_y = ((rand() % (WINDOW_HEIGHT/2 - 20 + 1))) + WINDOW_HEIGHT/2;
     spider.speed = 0.1;
-    spider.NEW_TARGET_POS_DELTA = 200;
+    spider.NEW_TARGET_POS_DELTA = 400;
     spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
 
 
@@ -213,6 +215,8 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         if(starship.collisionBox.intersects(spider.collisionBox))
         {
             std::cout << "You are dead!!" << std::endl;
+            starship.health--;
+            starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
         }
         
         int co = 1;
@@ -234,6 +238,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                     if (spider.collisionBox.contains(l_x, l_y))
                     {
                         std::cout << "Spider Killed!" << std::endl;
+                        spider.obj.setPosition(sf::Vector2f(900, 400));
                     }
                 }
                 if(l_y < 200)
@@ -257,7 +262,11 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
             }
         }
-        window->draw(starship.obj);
+        if (starship.health > 0)
+        {
+            window->draw(starship.obj);
+        }
+        
         window->draw(spider.obj);
         window->display();
     }
