@@ -23,9 +23,16 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     {
         std::cout << "Head unable to starship" << std::endl; 
     }
-    sf::Sprite starship;
-    starship.setTexture(starship_tex);
-    starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+
+    struct starship_obj
+    {
+        sf::Sprite obj;
+        sf::IntRect collisionBox;
+    };
+    starship_obj starship;
+    starship.obj.setTexture(starship_tex);
+    starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+    starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
 
     // load spider
     sf::Texture spider_tex;
@@ -55,6 +62,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     spider.target_y = ((rand() % (WINDOW_HEIGHT/2 - 20 + 1))) + WINDOW_HEIGHT/2;
     spider.speed = 0.1;
     spider.NEW_TARGET_POS_DELTA = 200;
+    spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
 
 
     sf::Color bg(10,24,26);
@@ -103,7 +111,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         mushrooms[i].collisionBox = sf::IntRect(mushrooms[i].x-10, mushrooms[i].y-10, 35, 35);
     }
 
-    starship.setTexture(starship_tex);
     int move = four_steps(rng);
 
     int c = 0;
@@ -153,6 +160,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         {
             spider.obj.move(0, -spider.speed);
         }
+        spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
         sf::Event event;
         while (window->pollEvent(event))
         {
@@ -171,7 +179,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         if (event.key.code == sf::Keyboard::Space)
                         {
                             lasers.push_back(sf::Sprite(laser_tex));
-                            lasers.back().setPosition(starship.getPosition());   
+                            lasers.back().setPosition(starship.obj.getPosition());   
                         }
                     }
                     break;
@@ -186,19 +194,25 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         {
             //std::cout << "Right key pressed" << std::endl;
             // left key is pressed: move our character
-            starship.move(0.1f, 0.f);
+            starship.obj.move(0.1f, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            starship.move(-0.1f, 0.f);
+            starship.obj.move(-0.1f, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            starship.move(0.f, -0.1f);
+            starship.obj.move(0.f, -0.1f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            starship.move(0.f, 0.1f);
+            starship.obj.move(0.f, 0.1f);
+        }
+        starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
+
+        if(starship.collisionBox.intersects(spider.collisionBox))
+        {
+            std::cout << "You are dead!!" << std::endl;
         }
         
         int co = 1;
@@ -217,11 +231,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         mushrooms[i].obj.setTexture(MUSHROOM_HEALTH_1_TEX); 
                         (*laser_it).setPosition(-10, -10); // laser positioned out of window
                     }
-                    // if ((mushrooms[i].x == l_x) && (mushrooms[i].y == l_y) && (mushrooms[i].health > 0))
-                    // {
-                    //     (*laser_it).move(0.f, WINDOW_HEIGHT + 100); // laser positioned out of window
-                    //     mushrooms[i].health--;
-                    // }
+                    if (spider.collisionBox.contains(l_x, l_y))
+                    {
+                        std::cout << "Spider Killed!" << std::endl;
+                    }
                 }
                 if(l_y < 200)
                 {
@@ -244,7 +257,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
             }
         }
-        window->draw(starship);
+        window->draw(starship.obj);
         window->draw(spider.obj);
         window->display();
     }
