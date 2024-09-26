@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <boost/random.hpp>
 #include <list>
+#include <cmath>
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
@@ -32,9 +33,29 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     {
         std::cout << "Head unable to spider" << std::endl; 
     }
-    sf::Sprite spider;
-    spider.setTexture(spider_tex);
-    spider.setPosition(900, 400);
+    
+    struct spider_obj
+    {
+        sf::Sprite obj;
+        float x;
+        float y;
+        sf::IntRect collisionBox;
+        float target_x;
+        float target_y;
+        int NEW_TARGET_POS_DELTA; // iterations count to pass before new target cords for spider
+        float speed;
+    };
+
+    spider_obj spider;
+    spider.obj = sf::Sprite(spider_tex);
+    spider.x = 900.0;
+    spider.y = 400.0;
+    spider.obj.setPosition(spider.x, spider.y);
+    spider.target_x = (rand() % (WINDOW_WIDTH - 20 + 1));
+    spider.target_y = ((rand() % (WINDOW_HEIGHT/2 - 20 + 1))) + WINDOW_HEIGHT/2;
+    spider.speed = 0.1;
+    spider.NEW_TARGET_POS_DELTA = 200;
+
 
     sf::Color bg(10,24,26);
     boost::random::mt19937 rng;
@@ -49,20 +70,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         std::cout << "Head unable to mushroom0" << std::endl; 
     }
     const int NUMBER_OF_MUSHROOMS = 30;
-    // sf::Sprite mushrooms[NUMBER_OF_MUSHROOMS];
-    // int mushroom_coords[NUMBER_OF_MUSHROOMS][3]; // [x, y, heath]
-    // for(int i=0; i<30; i++)
-    // {
-    //     mushrooms[i] = sf::Sprite(mushroom_tex);
-    //     int m_x = mushroom_pos_x(rng);
-    //     int m_y = mushroom_pos_y(rng);
-    //     mushrooms[i].setPosition(m_x, m_y);
-    //     mushroom_coords[i][0] = m_x;
-    //     mushroom_coords[i][1] = m_y;
-    //     mushroom_coords[i][2] = 2; // mushroom health: 2 (full), 1 (half), 0 (dead)
-    //     window->draw(mushrooms[i]);
-    // }
-
     sf::Texture MUSHROOM_HEALTH_2_TEX;
     if(!MUSHROOM_HEALTH_2_TEX.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png"))
     {
@@ -96,9 +103,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         mushrooms[i].collisionBox = sf::IntRect(mushrooms[i].x-10, mushrooms[i].y-10, 35, 35);
     }
 
-    
-    
-
     starship.setTexture(starship_tex);
     int move = four_steps(rng);
 
@@ -119,14 +123,36 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         std::cout << "No new laser" << std::endl;
     }
 
+
+    int loop_counter = 0;
     while (1)
     {
+        loop_counter++;
         window->clear(bg);
-    
-        spider.move(0.1*four_steps(rng), 0.1*four_steps(rng));
 
-        spider.setPosition(std::max(std::min((float)WINDOW_WIDTH-48, spider.getPosition().x), 0.f), std::max(std::min((float)WINDOW_HEIGHT-29, spider.getPosition().y), 330.f));
-
+        if (loop_counter == spider.NEW_TARGET_POS_DELTA)
+        {
+            loop_counter = 0;
+            spider.target_x = rand() % (WINDOW_WIDTH - 20 + 1);
+            spider.target_y = (rand() % (WINDOW_HEIGHT/2 - 20 - WINDOW_HEIGHT + 1)) + WINDOW_HEIGHT/2;
+        }
+        
+        if (spider.obj.getPosition().x < spider.target_x)
+        {
+            spider.obj.move(spider.speed, 0);
+        }
+        if (spider.obj.getPosition().x > spider.target_x)
+        {
+            spider.obj.move(-spider.speed, 0);
+        }
+        if (spider.obj.getPosition().y < spider.target_y)
+        {
+            spider.obj.move(0, spider.speed);
+        }
+        if (spider.obj.getPosition().y > spider.target_y)
+        {
+            spider.obj.move(0, -spider.speed);
+        }
         sf::Event event;
         while (window->pollEvent(event))
         {
@@ -219,7 +245,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             }
         }
         window->draw(starship);
-        window->draw(spider);
+        window->draw(spider.obj);
         window->display();
     }
 }
