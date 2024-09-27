@@ -6,35 +6,141 @@
 #include <time.h>
 #include <algorithm>
 #include <boost/random.hpp>
+#include <any>
 #include <list>
 #include <cmath>
+#include <sstream>
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
+
+
+class gameObject
+{
+    private:
+        void loadTexture (std::string textureFilePath)
+        {
+            sf::Texture newTexture;
+            if(!newTexture.loadFromFile(textureFilePath))
+            {
+                std::cout << "Error loading texture from: " << textureFilePath << std::endl;
+            }
+            this->texture = newTexture;
+        }
+        sf::Texture texture;
+        std::string name;
+        void updateCollisonBox(float padding)
+        {
+            this->collisonBox = sf::IntRect(this->getPosX() - padding, this->getPosY() - padding, \
+                                            this->sprite.getGlobalBounds().width + (2 * padding), \
+                                            this->sprite.getGlobalBounds().height + (2 * padding));
+        }
+
+        std::map<std::string, std::any> params;
+
+    public:
+        bool collisionEnabled = true;
+        float collsionPadding = 10;
+        sf::IntRect collisonBox;
+        sf::Sprite sprite;
+
+        gameObject (std::string name, std::string textureFilePath)
+        {
+            this->name = name;
+            this->loadTexture(textureFilePath);
+            this->updateTexture(this->texture);
+        }
+        gameObject (std::string name, sf::Texture textureFile)
+        {
+            this->name = name;
+            this->updateTexture(textureFile);
+        }
+        gameObject (std::string name, std::string textureFilePath, float posX, float posY)
+        {
+            this->name = name;
+            this->loadTexture(textureFilePath);
+            this->updateTexture(this->texture);
+            this->setPosition(posX, posY);
+        }
+        gameObject (std::string name, sf::Texture textureFile, float posX, float posY)
+        {
+            this->name = name;
+            this->updateTexture(textureFile);
+            this->sprite.setPosition(posX, posY);
+        }
+        void setPosition(float posX, float posY)
+        {
+            this->sprite.setPosition(posX, posY);
+            if (collisionEnabled)
+            {
+                this->updateCollisonBox(this->collsionPadding);
+            }
+        }
+        void updateTexture (sf::Texture newTexture)
+        {
+            this->texture = newTexture;
+            this->sprite.setTexture(this->texture);
+        }
+        void updateTexture (std::string textureFilePath)
+        {
+            this->loadTexture(textureFilePath);
+            this->sprite.setTexture(this->texture);
+        }
+        std::string getName()
+        {
+            return this->name;
+        }
+        float getPosX()
+        {
+            return this->sprite.getPosition().x;
+        }
+        float getPosY()
+        {
+            return this->sprite.getPosition().y;
+        }
+        void updateParam(std::string key, std::any value)
+        {
+            this->params[key] = value;
+        }
+        std::any getParam(std::string key)
+        {
+            return this->params[key];
+        }
+        void move(float delX, float delY)
+        {
+            this->sprite.setPosition(this->getPosX() + delX, this->getPosY() + delY);
+        }
+
+};
+
 
 void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 {
     window->setKeyRepeatEnabled(false);
     window->clear(sf::Color::White);
 
+    gameObject starship("startship", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png", WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+    starship.updateParam("health", (int16_t)3);
     // load starship
-    sf::Texture starship_tex;
-    if(!starship_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
-    {
-        std::cout << "Head unable to starship" << std::endl; 
-    }
+    // sf::Texture starship_tex;
+    // if(!starship_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
+    // {
+    //     std::cout << "Head unable to starship" << std::endl; 
+    // }
 
-    struct starship_obj
-    {
-        sf::Sprite obj;
-        sf::IntRect collisionBox;
-        int health;
-    };
-    starship_obj starship;
-    starship.obj.setTexture(starship_tex);
-    starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
-    starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
-    starship.health = 3;
+    // newTextureObj starship_tex = loadNewTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png", "startship");
+
+    // struct starship_obj
+    // {
+    //     sf::Sprite obj;
+    //     sf::IntRect collisionBox;
+    //     int health;
+    // };
+    // starship_obj starship;
+    // starship.obj.setTexture(starship_tex.tex);
+    // starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+    // starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
+    //starship.health = 3;
 
     // load spider
     sf::Texture spider_tex;
@@ -181,7 +287,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         if (event.key.code == sf::Keyboard::Space)
                         {
                             lasers.push_back(sf::Sprite(laser_tex));
-                            lasers.back().setPosition(starship.obj.getPosition());   
+                            lasers.back().setPosition(starship.getPosX(), starship.getPosY());   
                         }
                     }
                     break;
@@ -196,27 +302,29 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         {
             //std::cout << "Right key pressed" << std::endl;
             // left key is pressed: move our character
-            starship.obj.move(0.1f, 0.f);
+            starship.move(0.1f, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            starship.obj.move(-0.1f, 0.f);
+            starship.move(-0.1f, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            starship.obj.move(0.f, -0.1f);
+            starship.move(0.f, -0.1f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            starship.obj.move(0.f, 0.1f);
+            starship.move(0.f, 0.1f);
         }
-        starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
+        //starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
 
-        if(starship.collisionBox.intersects(spider.collisionBox))
+        if(starship.collisonBox.intersects(spider.collisionBox))
         {
             std::cout << "You are dead!!" << std::endl;
-            starship.health--;
-            starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+            int16_t currentHealth = std::any_cast<std::int16_t>(starship.getParam("health"));
+            starship.updateParam("health", (int16_t)(currentHealth - 1));
+            starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+            //starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
         }
         
         int co = 1;
@@ -262,9 +370,9 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
             }
         }
-        if (starship.health > 0)
+        if (std::any_cast<std::int16_t>(starship.getParam("health")) > 0)
         {
-            window->draw(starship.obj);
+            window->draw(starship.sprite);
         }
         
         window->draw(spider.obj);
