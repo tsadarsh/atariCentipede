@@ -29,11 +29,11 @@ class gameObject
         }
         sf::Texture texture;
         std::string name;
-        void updateCollisonBox(float padding)
+        void updateCollisonBox()
         {
-            this->collisonBox = sf::IntRect(this->getPosX() - padding, this->getPosY() - padding, \
-                                            this->sprite.getGlobalBounds().width + (2 * padding), \
-                                            this->sprite.getGlobalBounds().height + (2 * padding));
+            this->collisonBox = sf::IntRect(this->getPosX() - this->collsionPadding, this->getPosY() - this->collsionPadding, \
+                                            this->sprite.getTexture()->getSize().x + (2 * this->collsionPadding), \
+                                            this->sprite.getTexture()->getSize().y + (2 * this->collsionPadding));
         }
 
         std::map<std::string, std::any> params;
@@ -73,7 +73,7 @@ class gameObject
             this->sprite.setPosition(posX, posY);
             if (collisionEnabled)
             {
-                this->updateCollisonBox(this->collsionPadding);
+                this->updateCollisonBox();
             }
         }
         void updateTexture (sf::Texture newTexture)
@@ -108,7 +108,7 @@ class gameObject
         }
         void move(float delX, float delY)
         {
-            this->sprite.setPosition(this->getPosX() + delX, this->getPosY() + delY);
+            this->setPosition(this->getPosX() + delX, this->getPosY() + delY);
         }
 
 };
@@ -121,26 +121,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
     gameObject starship("startship", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png", WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
     starship.updateParam("health", (int16_t)3);
-    // load starship
-    // sf::Texture starship_tex;
-    // if(!starship_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
-    // {
-    //     std::cout << "Head unable to starship" << std::endl; 
-    // }
-
-    // newTextureObj starship_tex = loadNewTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png", "startship");
-
-    // struct starship_obj
-    // {
-    //     sf::Sprite obj;
-    //     sf::IntRect collisionBox;
-    //     int health;
-    // };
-    // starship_obj starship;
-    // starship.obj.setTexture(starship_tex.tex);
-    // starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
-    // starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
-    //starship.health = 3;
+    starship.collisionEnabled = true;
 
     // load spider
     sf::Texture spider_tex;
@@ -316,15 +297,13 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         {
             starship.move(0.f, 0.1f);
         }
-        //starship.collisionBox = sf::IntRect(starship.obj.getPosition().x-10, starship.obj.getPosition().y-10, 35, 35);
 
         if(starship.collisonBox.intersects(spider.collisionBox))
         {
+            starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
             std::cout << "You are dead!!" << std::endl;
             int16_t currentHealth = std::any_cast<std::int16_t>(starship.getParam("health"));
             starship.updateParam("health", (int16_t)(currentHealth - 1));
-            starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
-            //starship.obj.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
         }
         
         int co = 1;
@@ -374,7 +353,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         {
             window->draw(starship.sprite);
         }
-        
+        // if (starship.health > 0)
+        // {
+        //     window->draw(starship.sprite);
+        // }
         window->draw(spider.obj);
         window->display();
     }
