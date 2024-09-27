@@ -44,6 +44,11 @@ class gameObject
         sf::IntRect collisonBox;
         sf::Sprite sprite;
 
+        gameObject () {}
+        gameObject (std::string name) 
+        {
+            this->name = name;
+        }
         gameObject (std::string name, std::string textureFilePath)
         {
             this->name = name;
@@ -114,6 +119,20 @@ class gameObject
 };
 
 
+class spiderGameObj : public gameObject
+{
+    public:
+        float targetX;
+        float targetY;
+        float speed;
+        const int NEW_TARGET_POS_DELTA = 400;
+    
+        spiderGameObj(std::string name) : gameObject(name) {}
+        spiderGameObj(std::string name, std::string textureFilePath) : gameObject(name, textureFilePath) {}
+        spiderGameObj(std::string name, std::string textureFilePath, float posX, float posY) : gameObject(name, textureFilePath, posX, posY) {}
+};
+
+
 void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 {
     window->setKeyRepeatEnabled(false);
@@ -121,37 +140,47 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
     gameObject starship("startship", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png", WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
     starship.updateParam("health", (int16_t)3);
-    starship.collisionEnabled = true;
 
-    // load spider
-    sf::Texture spider_tex;
-    if(!spider_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/spider.png"))
-    {
-        std::cout << "Head unable to spider" << std::endl; 
-    }
-    
-    struct spider_obj
-    {
-        sf::Sprite obj;
-        float x;
-        float y;
-        sf::IntRect collisionBox;
-        float target_x;
-        float target_y;
-        int NEW_TARGET_POS_DELTA; // iterations count to pass before new target cords for spider
-        float speed;
-    };
-
-    spider_obj spider;
-    spider.obj = sf::Sprite(spider_tex);
-    spider.x = 900.0;
-    spider.y = 400.0;
-    spider.obj.setPosition(spider.x, spider.y);
-    spider.target_x = (rand() % (WINDOW_WIDTH - 20 + 1));
-    spider.target_y = ((rand() % (WINDOW_HEIGHT/2 - 20 + 1))) + WINDOW_HEIGHT/2;
+    spiderGameObj spider("spider", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/spider.png");
+    spider.setPosition(900, 400);
+    spider.targetX = rand() % (WINDOW_WIDTH - 20 + 1);
+    spider.targetY = (rand() % (WINDOW_HEIGHT / 2 - 20 + 1)) + WINDOW_HEIGHT / 2;
     spider.speed = 0.1;
-    spider.NEW_TARGET_POS_DELTA = 400;
-    spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
+    
+    //gameObject spider("spider", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/spider.png");
+    //spider.setPosition(900, 400);
+    //spider.updateParam("targetX", rand() % (WINDOW_WIDTH - 20 + 1));
+    //spider.updateParam("targetY", (rand() % (WINDOW_HEIGHT / 2 - 20 + 1)) + WINDOW_HEIGHT / 2);
+    //spider.updateParam("speed", 0.1);
+    // load spider
+    // sf::Texture spider_tex;
+    // if(!spider_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/spider.png"))
+    // {
+    //     std::cout << "Head unable to spider" << std::endl; 
+    // }
+    
+    // struct spider_obj
+    // {
+    //     sf::Sprite obj;
+    //     float x;
+    //     float y;
+    //     sf::IntRect collisionBox;
+    //     float target_x;
+    //     float target_y;
+    //     int NEW_TARGET_POS_DELTA; // iterations count to pass before new target cords for spider
+    //     float speed;
+    // };
+
+    // spider_obj spider;
+    // spider.obj = sf::Sprite(spider_tex);
+    // spider.x = 900.0;
+    // spider.y = 400.0;
+    // spider.obj.setPosition(spider.x, spider.y);
+    // spider.target_x = (rand() % (WINDOW_WIDTH - 20 + 1));
+    // spider.target_y = ((rand() % (WINDOW_HEIGHT/2 - 20 + 1))) + WINDOW_HEIGHT/2;
+    // spider.speed = 0.1;
+    // spider.NEW_TARGET_POS_DELTA = 400;
+    // spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
 
 
     sf::Color bg(10,24,26);
@@ -229,27 +258,27 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         if (loop_counter == spider.NEW_TARGET_POS_DELTA)
         {
             loop_counter = 0;
-            spider.target_x = rand() % (WINDOW_WIDTH - 20 + 1);
-            spider.target_y = (rand() % (WINDOW_HEIGHT/2 - 20 - WINDOW_HEIGHT + 1)) + WINDOW_HEIGHT/2;
+            spider.targetX = rand() % (WINDOW_WIDTH - 20 + 1);
+            spider.targetY = (rand() % (WINDOW_HEIGHT/2 - 20 - WINDOW_HEIGHT + 1)) + WINDOW_HEIGHT/2;
         }
         
-        if (spider.obj.getPosition().x < spider.target_x)
+        if (spider.getPosX() < spider.targetX)
         {
-            spider.obj.move(spider.speed, 0);
+            spider.move(spider.speed, 0);
         }
-        if (spider.obj.getPosition().x > spider.target_x)
+        if (spider.getPosX() > spider.targetX)
         {
-            spider.obj.move(-spider.speed, 0);
+            spider.move(-spider.speed, 0);
         }
-        if (spider.obj.getPosition().y < spider.target_y)
+        if (spider.getPosY() < spider.targetY)
         {
-            spider.obj.move(0, spider.speed);
+            spider.move(0, spider.speed);
         }
-        if (spider.obj.getPosition().y > spider.target_y)
+        if (spider.getPosY() > spider.targetY)
         {
-            spider.obj.move(0, -spider.speed);
+            spider.move(0, -spider.speed);
         }
-        spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
+        //spider.collisionBox = sf::IntRect(spider.obj.getPosition().x-10, spider.obj.getPosition().y-10, 35, 35);
         sf::Event event;
         while (window->pollEvent(event))
         {
@@ -298,7 +327,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             starship.move(0.f, 0.1f);
         }
 
-        if(starship.collisonBox.intersects(spider.collisionBox))
+        if(starship.collisonBox.intersects(spider.collisonBox))
         {
             starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
             std::cout << "You are dead!!" << std::endl;
@@ -322,10 +351,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         mushrooms[i].obj.setTexture(MUSHROOM_HEALTH_1_TEX); 
                         (*laser_it).setPosition(-10, -10); // laser positioned out of window
                     }
-                    if (spider.collisionBox.contains(l_x, l_y))
+                    if (spider.collisonBox.contains(l_x, l_y))
                     {
                         std::cout << "Spider Killed!" << std::endl;
-                        spider.obj.setPosition(sf::Vector2f(900, 400));
+                        spider.setPosition(900, 400);
                     }
                 }
                 if(l_y < 200)
@@ -357,7 +386,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         // {
         //     window->draw(starship.sprite);
         // }
-        window->draw(spider.obj);
+        window->draw(spider.sprite);
         window->display();
     }
 }
