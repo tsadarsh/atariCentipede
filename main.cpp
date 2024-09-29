@@ -29,6 +29,16 @@ class gameObject
             this->textureFilePath = textureFilePath;
             this->texture = newTexture;
         }
+        void loadTexture (std::string textureFilePath, sf::IntRect area)
+        {
+            sf::Texture newTexture;
+            if(!newTexture.loadFromFile(textureFilePath, area))
+            {
+                std::cout << "Error loading texture from: " << textureFilePath << std::endl;
+            }
+            this->textureFilePath = textureFilePath;
+            this->texture = newTexture;
+        }
         std::string name;
         void updateCollisonBox()
         {
@@ -63,6 +73,12 @@ class gameObject
             this->name = name;
             this->updateTexture(textureFile);
         }
+        gameObject (std::string name, std::string textureFilePath, sf::IntRect area)
+        {
+            this->name = name;
+            this->loadTexture(textureFilePath, area);
+            this->updateTexture(this->texture);
+        }    
         gameObject (std::string name, std::string textureFilePath, float posX, float posY)
         {
             this->name = name;
@@ -135,6 +151,35 @@ class spiderGameObj : public gameObject
         spiderGameObj(std::string name, std::string textureFilePath, float posX, float posY) : gameObject(name, textureFilePath, posX, posY) {}
 };
 
+class mushroomGameObj : public gameObject
+{
+    public:
+        int health = 2;
+
+        mushroomGameObj(std::string name, std::string textureFilePath, float posX, float posY) : gameObject(name, textureFilePath, posX, posY) {}
+
+        void damage(int pts)
+        {
+            health--;
+            switch (health)
+            {
+            case 2:
+                updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
+                break;
+            
+            case 1:
+                updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom1.png");
+                break;
+            
+            case 0:
+                setPosition(-10, -10);
+                break;
+            
+            default:
+                break;
+            }
+        }
+};
 
 // class mushroomGameObj : public gameObject
 // {
@@ -184,10 +229,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     boost::random::uniform_int_distribution<> mushroom_pos_y(0, WINDOW_HEIGHT);
 
     // load mushroom
-    std::vector<gameObject> mushrooms;
+    std::vector<mushroomGameObj> mushrooms;
     for(int i=0; i<30; i++)
     {
-        gameObject mushroom("mushroom"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png", mushroom_pos_x(rng), mushroom_pos_y(rng));
+        mushroomGameObj mushroom("mushroom"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png", mushroom_pos_x(rng), mushroom_pos_y(rng));
         mushrooms.push_back(mushroom);
     }
     for(int i=0; i<30; i++)
@@ -196,19 +241,13 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     }
 
     // load laser
-    sf::Texture laser_tex;
-    if(!laser_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20)))
-    {
-        std::cout << "Head unable to laser" << std::endl;
-    }
-    std::list <sf::Sprite> lasers;
-    std::list<sf::Sprite>::iterator laser_it;
-
-    sf::Texture new_laser_tex;
-    if(!new_laser_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/violet-neon.jpg", sf::IntRect(10, 10, 3, 20)))
-    {
-        std::cout << "No new laser" << std::endl;
-    }
+    gameObject laser("laser", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20));
+    // sf::Texture laser_tex;
+    // if(!laser_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20)))
+    // {
+    //     std::cout << "Head unable to laser" << std::endl;
+    // }
+    std::list <gameObject> lasers;
 
 
     int loop_counter = 0;
@@ -258,8 +297,9 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                     {
                         if (event.key.code == sf::Keyboard::Space)
                         {
-                            lasers.push_back(sf::Sprite(laser_tex));
-                            lasers.back().setPosition(starship.getPosX(), starship.getPosY());   
+                            gameObject laser("laser", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20));
+                            lasers.push_back(laser);
+                            lasers.back().setPosition(starship.getPosX(), starship.getPosY());  
                         }
                     }
                     break;
@@ -298,35 +338,30 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         }
         
         int co = 1;
-        // for(laser_it=lasers.begin(); laser_it!=lasers.end(); ++laser_it)
-        // {
-        //     int l_x = (*laser_it).getPosition().x;
-        //     int l_y = (*laser_it).getPosition().y;
+        for(auto i_laser=lasers.begin(); i_laser != lasers.end(); i_laser++)
+        {
+            float l_x = (*i_laser).getPosX();
+            float l_y = (*i_laser).getPosY();
 
-        //     if(l_y > 0)
-        //     {
-        //         for (int i=0; i < NUMBER_OF_MUSHROOMS; i++)
-        //         {
-        //             if (mushrooms[i].collisionBox.contains(l_x, l_y) and mushrooms[i].health > 0)
-        //             {
-        //                 mushrooms[i].health--;
-        //                 mushrooms[i].obj.setTexture(MUSHROOM_HEALTH_1_TEX); 
-        //                 (*laser_it).setPosition(-10, -10); // laser positioned out of window
-        //             }
-        //             if (spider.collisonBox.contains(l_x, l_y))
-        //             {
-        //                 std::cout << "Spider Killed!" << std::endl;
-        //                 spider.setPosition(900, 400);
-        //             }
-        //         }
-        //         if(l_y < 200)
-        //         {
-        //             (*laser_it).setTexture(new_laser_tex);
-        //         }
-        //         (*laser_it).move(0.f, -0.1f);
-        //         window->draw(*laser_it);
-        //     }
-        // }
+            if(l_y > 0)
+            {
+                for (std::vector<mushroomGameObj>::iterator i_mushroom=mushrooms.begin(); i_mushroom != mushrooms.end(); i_mushroom++)
+                {
+                    if ((*i_mushroom).collisonBox.contains(l_x, l_y) and (*i_mushroom).health > 0)
+                    {
+                        (*i_mushroom).damage(1);
+                        (*i_laser).setPosition(-10, -10); // laser positioned out of window
+                    }
+                    if (spider.collisonBox.contains(l_x, l_y))
+                    {
+                        std::cout << "Spider Killed!" << std::endl;
+                        spider.setPosition(900, 400);
+                    }
+                }
+                (*i_laser).move(0.f, -0.1f);
+                window->draw((*i_laser).sprite);
+            }
+        }
 
         // for(int i=0; i<30; i++)
         // {
