@@ -10,6 +10,7 @@
 #include <list>
 #include <cmath>
 #include <sstream>
+#include <iterator>
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
@@ -134,29 +135,32 @@ class spiderGameObj : public gameObject
         spiderGameObj(std::string name, std::string textureFilePath, float posX, float posY) : gameObject(name, textureFilePath, posX, posY) {}
 };
 
-class mushroomGameObj : public gameObject
-{
-    public:
-        int population;
-        std::vector<gameObject> instances;
-        sf::Texture tex;
 
-        mushroomGameObj(std::string name, std::string textureFilePath) : gameObject(name, textureFilePath) {
-            this->tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
-        }
+// class mushroomGameObj : public gameObject
+// {
+//     public:
+//         int population;
+//         gameObject* instances_arr;
+//         sf::Texture tex;
 
-        void populateRandomly(int population, sf::IntRect area)
-        {
-            this->population = population;
-            for (int i=0; i < this->population; i++)
-            {
-                std::cout << this->textureFilePath << std::endl;
-                gameObject mushroom("mushroom"+std::to_string(i), tex, (rand() % area.width) + area.left, (rand() %  area.height) + area.top);
-                this->instances.push_back(mushroom);
-            }
-        }
+//         mushroomGameObj(std::string name, std::string textureFilePath) : gameObject(name, textureFilePath) {
+            
+//         }
 
-};
+//         void populateRandomly(int population, sf::IntRect area)
+//         {
+//             this->population = population;
+//             gameObject instances[population];
+//             for (int i=0; i < this->population; i++)
+//             {
+//                 instances[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
+//                 instances[i].setPosition(rand(), rand());   
+//             }
+//             instances_arr = new gameObject[population];
+//             std::copy(&instances, &instances+population, &instances_arr, &instances_arr+population);
+//         }
+
+// };
 
 
 void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
@@ -180,52 +184,16 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     boost::random::uniform_int_distribution<> mushroom_pos_y(0, WINDOW_HEIGHT);
 
     // load mushroom
-    mushroomGameObj mushrooms("mushrooms", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
-    mushrooms.populateRandomly(30, sf::IntRect(0, 0, WINDOW_WIDTH, WINDOW_WIDTH));
-
-
-    // sf::Texture mushroom_tex;
-    // if(!mushroom_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png"))
-    // {
-    //     std::cout << "Head unable to mushroom0" << std::endl; 
-    // }
-    // const int NUMBER_OF_MUSHROOMS = 30;
-    // sf::Texture MUSHROOM_HEALTH_2_TEX;
-    // if(!MUSHROOM_HEALTH_2_TEX.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png"))
-    // {
-    //     std::cout << "Head unable to health 2 mushroom" << std::endl; 
-    // }
-
-    // sf::Texture MUSHROOM_HEALTH_1_TEX;
-    // if(!MUSHROOM_HEALTH_1_TEX.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom1.png"))
-    // {
-    //     std::cout << "Head unable to health 1 mushroom" << std::endl; 
-    // }
-
-    // struct mushroom_obj
-    // {
-    //     sf::Sprite obj;
-    //     int x;
-    //     int y;
-    //     int health;
-    //     sf::IntRect collisionBox;
-    // };
-
-    // const int MAX_MUSHROOM_COUNT = 30;
-    // mushroom_obj mushrooms[MAX_MUSHROOM_COUNT];
-    // for (int i=0; i<MAX_MUSHROOM_COUNT; i++)
-    // {
-    //     mushrooms[i].obj = sf::Sprite(MUSHROOM_HEALTH_2_TEX);
-    //     mushrooms[i].x = mushroom_pos_x(rng);
-    //     mushrooms[i].y = mushroom_pos_y(rng);
-    //     mushrooms[i].health = 2;
-    //     mushrooms[i].obj.setPosition(mushrooms[i].x, mushrooms[i].y);
-    //     mushrooms[i].collisionBox = sf::IntRect(mushrooms[i].x-10, mushrooms[i].y-10, 35, 35);
-    // }
-
-    int move = four_steps(rng);
-
-    int c = 0;
+    std::vector<gameObject> mushrooms;
+    for(int i=0; i<30; i++)
+    {
+        gameObject mushroom("mushroom"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png", mushroom_pos_x(rng), mushroom_pos_y(rng));
+        mushrooms.push_back(mushroom);
+    }
+    for(int i=0; i<30; i++)
+    {
+        mushrooms[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
+    }
 
     // load laser
     sf::Texture laser_tex;
@@ -372,11 +340,35 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
         //     }
         // }
-        for (gameObject i : mushrooms.instances)
+        // for (int i=0; i<30; i++)
+        // {
+        //     std::cout << "name: " << mushrooms[i].getName() << std::endl;
+        //     window->draw(mushrooms[i].sprite);
+        // }
+        //window->draw(mushrooms[1].sprite);
+        // auto x =  mushrooms.at(2);
+        //window->draw((*mushrooms.at(2)).sprite);
+        // for(auto x = mushrooms.begin(); x!=mushrooms.end(); x++)
+        // {
+        //     window->draw((*(*x)).sprite);
+        // }
+        // for(gameObject m : mushrooms)
+        // {
+        //     window->draw(m.sprite);
+        // std::cout << m.
+        // }
+        
+        for(int i=0; i<30; i++)
         {
-            std::cout << "path:" << i.textureFilePath << std::endl;
-            window->draw(i.sprite);
+            window->draw(mushrooms[i].sprite);
+            // std::cout << mushrooms[i].getName();
         }
+
+        // for(gameObject m : mushrooms)
+        // {
+        //     window->draw(m.sprite);
+        // }
+
         if (std::any_cast<std::int16_t>(starship.getParam("health")) > 0)
         {
             window->draw(starship.sprite);
