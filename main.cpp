@@ -186,10 +186,7 @@ class centipedeGameObject : public gameObject
 {
     public:
         std::vector<std::vector<gameObject>> family;
-        centipedeGameObject()
-        {
-            spawnNew();
-        }
+        centipedeGameObject() {}
 
         void spawnNew()
         {
@@ -292,39 +289,11 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
     // load laser
     gameObject laser("laser", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20));
-    std::list <gameObject> lasers;
+    std::vector <gameObject> lasers;
 
-
-    const int numParticles = 10;
-    const float particleRadius = 10.f;
-    const float speed = 200.f;
-    const float followDistance = 30.f; // Distance each particle tries to maintain from the one in front
-
-    // Create particles (lead particle + followers)
-    // std::vector<sf::CircleShape> particles(numParticles);
-    // for (int i = 0; i < numParticles; ++i) {
-    //     particles[i].setRadius(particleRadius);
-    //     particles[i].setFillColor(sf::Color::White);
-    //     particles[i].setOrigin(particleRadius, particleRadius); // Center origin for proper movement
-    //     particles[i].setPosition(400.f, 300.f + i * followDistance); // Position them initially in a vertical line
-    // }
-
-    // std::vector<gameObject> centipede(11);
-    // gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", 400, 300);
-    // centipede.push_back(centipedeHead);
-    // for(int i=0; i<10; i++)
-    // {
-    //     gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", 400, 300 + (i+1)*20);
-    //     centipede.push_back(centipedeBody);
-    // }
-    // centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
-    // centipede[0].sprite.setPosition(400, 300);
-    // for(int i=1;i<11;i++)
-    // {
-    //     centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
-    //     centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
-    // }
     centipedeGameObject centipede;
+    centipede.spawnNew();
+
     sf::Clock clock;
 
 
@@ -410,50 +379,21 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
         // Control the lead particle (the first one)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-            //particles[0].move(0, -speed * deltaTime);
-            // centipede.family[0][0].sprite.move(0, -200*deltaTime);
             centipede.move(0, -200*deltaTime, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            //particles[0].move(0, speed * deltaTime);
-            // centipede.family[0][0].sprite.move(0, 200*deltaTime);
             centipede.move(0, 200*deltaTime, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            //particles[0].move(-speed * deltaTime, 0);
-            // centipede.family[0][0].sprite.move(-200*deltaTime, 0);
             centipede.move(-200*deltaTime, 0, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            //particles[0].move(speed * deltaTime, 0);
-            // centipede.family[0][0].sprite.move(200*deltaTime, 0);
             centipede.move(200*deltaTime, 0, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
             centipede.spawnNew();
         }
 
-        // For each particle except the lead one, make it follow the one ahead
-        // for (int i = 1; i < numParticles; ++i) {
-        //     sf::Vector2f dir = particles[i - 1].getPosition() - particles[i].getPosition();
-        //     float dist = distance(particles[i - 1].getPosition(), particles[i].getPosition());
-
-        //     if (dist > followDistance) {
-        //         // Normalize the direction vector and move the particle towards the one ahead
-        //         particles[i].move(normalize(dir) * (speed * deltaTime));
-        //     }
-        // }
-
-        // for (int i=1; i < 11; ++i)
-        // {
-        //     sf::Vector2f dir = centipede.family[0][i-1].sprite.getPosition() - centipede.family[0][i].sprite.getPosition() ;
-        //     float dist = distance(centipede.family[0][i-1].sprite.getPosition(), centipede.family[0][i].sprite.getPosition());
-
-        //     if (dist > 20)
-        //     {
-        //         centipede.family[0][i].sprite.move(normalize(dir) * (200 * deltaTime));
-        //     }
-        // }
 
         if(starship.collisonBox.intersects(spider.collisonBox))
         {
@@ -465,18 +405,19 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         
         int co = 1;
         for(auto i_laser=lasers.begin(); i_laser != lasers.end(); i_laser++)
+        for(int i_laser = 0; i_laser < lasers.size(); i_laser++)
         {
-            float l_x = (*i_laser).getPosX();
-            float l_y = (*i_laser).getPosY();
+            float l_x = lasers[i_laser].getPosX();
+            float l_y = lasers[i_laser].getPosY();
 
             if(l_y > 0)
             {
-                for (std::vector<mushroomGameObj>::iterator i_mushroom=mushrooms.begin(); i_mushroom != mushrooms.end(); i_mushroom++)
+                for (int i_mushroom = 0; i_mushroom < mushrooms.size() ; i_mushroom++)
                 {
-                    if ((*i_mushroom).collisonBox.contains(l_x, l_y) and (*i_mushroom).health > 0)
+                    if(mushrooms[i_mushroom].collisonBox.contains(l_x, l_y) & mushrooms[i_mushroom].health > 0)
                     {
-                        (*i_mushroom).damage(1);
-                        (*i_laser).setPosition(-10, -10); // laser positioned out of window
+                        mushrooms[i_mushroom].damage(1);
+                        lasers[i_laser].setPosition(-10, -10);
                     }
                     if (spider.collisonBox.contains(l_x, l_y))
                     {
@@ -484,18 +425,9 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         spider.setPosition(900, 400);
                     }
                 }
-                int c_centipede = 0;
-                // for(std::vector<gameObject>::iterator i_centipede=centipede.begin(); i_centipede != centipede.end(); i_centipede++)
-                // {
-                //     c_centipede++;
-                //     if((*i_centipede).collisonBox.contains(l_x, l_y))
-                //     {
-                //         centipede.resize(c_centipede);
-                //         break;
-                //     }
-                // }
-                (*i_laser).move(0.f, -0.1f);
-                window->draw((*i_laser).sprite);
+
+                lasers[i_laser].move(0.f, -0.1f);
+                window->draw(lasers[i_laser].sprite);
             }
         }
 
@@ -505,20 +437,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             // std::cout << mushrooms[i].getName();
         }
 
-        // for(gameObject m : mushrooms)
-        // {
-        //     window->draw(m.sprite);
-        // }
-
         if (std::any_cast<std::int16_t>(starship.getParam("health")) > 0)
         {
             window->draw(starship.sprite);
         }
-
-        // Draw particles
-        // for (int i = 0; i < numParticles; ++i) {
-        //     window->draw(particles[i]);
-        // }
 
         std::cout << centipede.family[0][0].sprite.getPosition().x << ", " << centipede.family[0][0].sprite.getPosition().y << std::endl;
         for (int i_family = 0; i_family < centipede.family.size(); i_family++)
