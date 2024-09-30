@@ -182,6 +182,55 @@ class mushroomGameObj : public gameObject
         }
 };
 
+class centipedeGameObject : public gameObject
+{
+    public:
+        std::vector<std::vector<gameObject>> family;
+        centipedeGameObject()
+        {
+            spawnNew();
+        }
+
+        void spawnNew()
+        {
+            std::vector<gameObject> centipede;
+            gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", 400, 300);
+            centipede.push_back(centipedeHead);
+            for(int i=0; i<10; i++)
+            {
+                gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", 400, 300 + (i+1)*20);
+                centipede.push_back(centipedeBody);
+            }
+            centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
+            centipede[0].sprite.setPosition(400, 300);
+            for(int i=1;i<11;i++)
+            {
+                centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
+                centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
+            }
+            family.push_back(centipede);   
+        }
+
+        void move(float offsetX, float offsetY, float deltaTime)
+        {
+            for(int i_family=0; i_family<family.size(); i_family++)
+            {
+                family[i_family][0].sprite.move(offsetX, offsetY);
+                for (int i=1; i < 11; ++i)
+                {
+                    sf::Vector2f dir = family[i_family][i-1].sprite.getPosition() - family[i_family][i].sprite.getPosition() ;
+                    float dist = distance(family[i_family][i-1].sprite.getPosition(), family[i_family][i].sprite.getPosition());
+
+                    if (dist > 20)
+                    {
+                        family[i_family][i].sprite.move(normalize(dir) * (200 * deltaTime));
+                    }
+                }
+            }
+
+        }
+};
+
 // class mushroomGameObj : public gameObject
 // {
 //     public:
@@ -260,21 +309,22 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     //     particles[i].setPosition(400.f, 300.f + i * followDistance); // Position them initially in a vertical line
     // }
 
-    std::vector<gameObject> centipede(11);
-    gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", 400, 300);
-    centipede.push_back(centipedeHead);
-    for(int i=0; i<10; i++)
-    {
-        gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", 400, 300 + (i+1)*20);
-        centipede.push_back(centipedeBody);
-    }
-    centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
-    centipede[0].sprite.setPosition(400, 300);
-    for(int i=1;i<11;i++)
-    {
-        centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
-        centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
-    }
+    // std::vector<gameObject> centipede(11);
+    // gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", 400, 300);
+    // centipede.push_back(centipedeHead);
+    // for(int i=0; i<10; i++)
+    // {
+    //     gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", 400, 300 + (i+1)*20);
+    //     centipede.push_back(centipedeBody);
+    // }
+    // centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
+    // centipede[0].sprite.setPosition(400, 300);
+    // for(int i=1;i<11;i++)
+    // {
+    //     centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
+    //     centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
+    // }
+    centipedeGameObject centipede;
     sf::Clock clock;
 
 
@@ -361,19 +411,26 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         // Control the lead particle (the first one)
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
             //particles[0].move(0, -speed * deltaTime);
-            centipede[0].sprite.move(0, -200*deltaTime);
+            // centipede.family[0][0].sprite.move(0, -200*deltaTime);
+            centipede.move(0, -200*deltaTime, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             //particles[0].move(0, speed * deltaTime);
-            centipede[0].sprite.move(0, 200*deltaTime);
+            // centipede.family[0][0].sprite.move(0, 200*deltaTime);
+            centipede.move(0, 200*deltaTime, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             //particles[0].move(-speed * deltaTime, 0);
-            centipede[0].sprite.move(-200*deltaTime, 0);
+            // centipede.family[0][0].sprite.move(-200*deltaTime, 0);
+            centipede.move(-200*deltaTime, 0, deltaTime);
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             //particles[0].move(speed * deltaTime, 0);
-            centipede[0].sprite.move(200*deltaTime, 0);
+            // centipede.family[0][0].sprite.move(200*deltaTime, 0);
+            centipede.move(200*deltaTime, 0, deltaTime);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
+            centipede.spawnNew();
         }
 
         // For each particle except the lead one, make it follow the one ahead
@@ -387,16 +444,16 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         //     }
         // }
 
-        for (int i=1; i < 11; ++i)
-        {
-            sf::Vector2f dir = centipede[i-1].sprite.getPosition() - centipede[i].sprite.getPosition() ;
-            float dist = distance(centipede[i-1].sprite.getPosition(), centipede[i].sprite.getPosition());
+        // for (int i=1; i < 11; ++i)
+        // {
+        //     sf::Vector2f dir = centipede.family[0][i-1].sprite.getPosition() - centipede.family[0][i].sprite.getPosition() ;
+        //     float dist = distance(centipede.family[0][i-1].sprite.getPosition(), centipede.family[0][i].sprite.getPosition());
 
-            if (dist > 20)
-            {
-                centipede[i].sprite.move(normalize(dir) * (200 * deltaTime));
-            }
-        }
+        //     if (dist > 20)
+        //     {
+        //         centipede.family[0][i].sprite.move(normalize(dir) * (200 * deltaTime));
+        //     }
+        // }
 
         if(starship.collisonBox.intersects(spider.collisonBox))
         {
@@ -427,6 +484,16 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         spider.setPosition(900, 400);
                     }
                 }
+                int c_centipede = 0;
+                // for(std::vector<gameObject>::iterator i_centipede=centipede.begin(); i_centipede != centipede.end(); i_centipede++)
+                // {
+                //     c_centipede++;
+                //     if((*i_centipede).collisonBox.contains(l_x, l_y))
+                //     {
+                //         centipede.resize(c_centipede);
+                //         break;
+                //     }
+                // }
                 (*i_laser).move(0.f, -0.1f);
                 window->draw((*i_laser).sprite);
             }
@@ -453,12 +520,14 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         //     window->draw(particles[i]);
         // }
 
-        std::cout << centipede[0].sprite.getPosition().x << ", " << centipede[0].sprite.getPosition().y << std::endl;
-        for (int i=0; i<11; i++)
+        std::cout << centipede.family[0][0].sprite.getPosition().x << ", " << centipede.family[0][0].sprite.getPosition().y << std::endl;
+        for (int i_family = 0; i_family < centipede.family.size(); i_family++)
         {
-            window->draw(centipede[i].sprite);
+            for (int i=0; i<11; i++)
+            {
+                window->draw(centipede.family[i_family][i].sprite);
+            }
         }
-
         window->draw(spider.sprite);
         window->display();
     }
