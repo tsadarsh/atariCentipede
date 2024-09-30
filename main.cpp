@@ -12,131 +12,10 @@
 #include <sstream>
 #include <iterator>
 #include "helper_func.cpp"
+#include "gameObject.cpp"
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
-
-
-class gameObject
-{
-    private:
-        void loadTexture (std::string textureFilePath)
-        {
-            sf::Texture newTexture;
-            if(!newTexture.loadFromFile(textureFilePath))
-            {
-                std::cout << "Error loading texture from: " << textureFilePath << std::endl;
-            }
-            this->textureFilePath = textureFilePath;
-            this->texture = newTexture;
-        }
-        void loadTexture (std::string textureFilePath, sf::IntRect area)
-        {
-            sf::Texture newTexture;
-            if(!newTexture.loadFromFile(textureFilePath, area))
-            {
-                std::cout << "Error loading texture from: " << textureFilePath << std::endl;
-            }
-            this->textureFilePath = textureFilePath;
-            this->texture = newTexture;
-        }
-        std::string name;
-        void updateCollisonBox()
-        {
-            this->collisonBox = sf::IntRect(this->getPosX() - this->collsionPadding, this->getPosY() - this->collsionPadding, \
-                                            this->sprite.getTexture()->getSize().x + (2 * this->collsionPadding), \
-                                            this->sprite.getTexture()->getSize().y + (2 * this->collsionPadding));
-        }
-
-        std::map<std::string, std::any> params;
-
-    public:
-        sf::Texture texture;
-        std::string textureFilePath;
-        bool collisionEnabled = true;
-        float collsionPadding = 10;
-        sf::IntRect collisonBox;
-        sf::Sprite sprite;
-
-        gameObject () {}
-        gameObject (std::string name) 
-        {
-            this->name = name;
-        }
-        gameObject (std::string name, std::string textureFilePath)
-        {
-            this->name = name;
-            this->loadTexture(textureFilePath);
-            this->updateTexture(this->texture);
-        }
-        gameObject (std::string name, sf::Texture textureFile)
-        {
-            this->name = name;
-            this->updateTexture(textureFile);
-        }
-        gameObject (std::string name, std::string textureFilePath, sf::IntRect area)
-        {
-            this->name = name;
-            this->loadTexture(textureFilePath, area);
-            this->updateTexture(this->texture);
-        }    
-        gameObject (std::string name, std::string textureFilePath, float posX, float posY)
-        {
-            this->name = name;
-            this->loadTexture(textureFilePath);
-            this->updateTexture(this->texture);
-            this->setPosition(posX, posY);
-        }
-        gameObject (std::string name, sf::Texture textureFile, float posX, float posY)
-        {
-            this->name = name;
-            this->updateTexture(textureFile);
-            this->sprite.setPosition(posX, posY);
-        }
-        void setPosition(float posX, float posY)
-        {
-            this->sprite.setPosition(posX, posY);
-            if (collisionEnabled)
-            {
-                this->updateCollisonBox();
-            }
-        }
-        void updateTexture (sf::Texture newTexture)
-        {
-            this->texture = newTexture;
-            this->sprite.setTexture(this->texture);
-        }
-        void updateTexture (std::string textureFilePath)
-        {
-            this->loadTexture(textureFilePath);
-            this->sprite.setTexture(this->texture);
-        }
-        std::string getName()
-        {
-            return this->name;
-        }
-        float getPosX()
-        {
-            return this->sprite.getPosition().x;
-        }
-        float getPosY()
-        {
-            return this->sprite.getPosition().y;
-        }
-        void updateParam(std::string key, std::any value)
-        {
-            this->params[key] = value;
-        }
-        std::any getParam(std::string key)
-        {
-            return this->params[key];
-        }
-        void move(float delX, float delY)
-        {
-            this->setPosition(this->getPosX() + delX, this->getPosY() + delY);
-        }
-
-};
 
 
 class spiderGameObj : public gameObject
@@ -186,7 +65,7 @@ class centipedeGameObject : public gameObject
 {
     public:
         std::vector<std::vector<gameObject>> family;
-        centipedeGameObject() {}
+        centipedeGameObject() : gameObject () {}
 
         void spawnNew()
         {
@@ -212,7 +91,7 @@ class centipedeGameObject : public gameObject
         {
             for(int i_family=0; i_family<family.size(); i_family++)
             {
-                family[i_family][0].sprite.move(offsetX, offsetY);
+                family[i_family][0].move(offsetX, offsetY);
                 for (int i=1; i < 11; ++i)
                 {
                     sf::Vector2f dir = family[i_family][i-1].sprite.getPosition() - family[i_family][i].sprite.getPosition() ;
@@ -220,7 +99,7 @@ class centipedeGameObject : public gameObject
 
                     if (dist > 20)
                     {
-                        family[i_family][i].sprite.move(normalize(dir) * (200 * deltaTime));
+                        family[i_family][i].move((normalize(dir) * (200 * deltaTime)).x, (normalize(dir) * (200 * deltaTime)).y);
                     }
                 }
             }
@@ -419,10 +298,24 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         mushrooms[i_mushroom].damage(1);
                         lasers[i_laser].setPosition(-10, -10);
                     }
-                    if (spider.collisonBox.contains(l_x, l_y))
+                }
+
+                if (spider.collisonBox.contains(l_x, l_y))
+                {
+                    std::cout << "Spider Killed!" << std::endl;
+                    spider.setPosition(900, 400);
+                }
+
+                for (int i_centipedeFamily = 0; i_centipedeFamily < centipede.family.size(); i_centipedeFamily++)
+                {
+                    for (int i_body = 0; i_body < centipede.family[i_centipedeFamily].size(); i_body++)
                     {
-                        std::cout << "Spider Killed!" << std::endl;
-                        spider.setPosition(900, 400);
+                        if (centipede.family[i_centipedeFamily][i_body].collisonBox.contains(l_x, l_y))
+                        {
+                            lasers[i_laser].setPosition(-10, -10);
+                            centipede.spawnNew();
+                            std::cout << "Laser hit centipede!" << std::endl;
+                        }
                     }
                 }
 
@@ -434,7 +327,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         for(int i=0; i<30; i++)
         {
             window->draw(mushrooms[i].sprite);
-            // std::cout << mushrooms[i].getName();
         }
 
         if (std::any_cast<std::int16_t>(starship.getParam("health")) > 0)
@@ -442,7 +334,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             window->draw(starship.sprite);
         }
 
-        std::cout << centipede.family[0][0].sprite.getPosition().x << ", " << centipede.family[0][0].sprite.getPosition().y << std::endl;
+        std::cout << centipede.family[0][0].sprite.getPosition().x << ", " << centipede.family[0][0].collisonBox.left << std::endl;
         for (int i_family = 0; i_family < centipede.family.size(); i_family++)
         {
             for (int i=0; i<11; i++)
