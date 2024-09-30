@@ -4,5 +4,6 @@ project(Lab1 VERSION 0.1.0 LANGUAGES C CXX)
 add_executable(Lab1 main.cpp)
 
 #find_package(SFML COMPONENTS graphics window system)
+find_package(Boost REQUIRED COMPONENTS random)
 target_link_libraries(Lab1 sfml-graphics sfml-window sfml-system)
 

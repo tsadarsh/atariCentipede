@@ -1,3 +1,6 @@
+#ifndef _GAME_OBJ
+#define _GAME_OBJ
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <any>
@@ -122,3 +125,5 @@ class gameObject
         }
 
 };
+
+#endif
