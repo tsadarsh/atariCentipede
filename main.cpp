@@ -11,6 +11,7 @@
 #include <cmath>
 #include <sstream>
 #include <iterator>
+#include "helper_func.cpp"
 
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
@@ -172,7 +173,7 @@ class mushroomGameObj : public gameObject
                 break;
             
             case 0:
-                setPosition(-10, -10);
+                setPosition(-10, -10); // mushroom positioned out of window
                 break;
             
             default:
@@ -242,17 +243,45 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
     // load laser
     gameObject laser("laser", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20));
-    // sf::Texture laser_tex;
-    // if(!laser_tex.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20)))
-    // {
-    //     std::cout << "Head unable to laser" << std::endl;
-    // }
     std::list <gameObject> lasers;
+
+
+    const int numParticles = 10;
+    const float particleRadius = 10.f;
+    const float speed = 200.f;
+    const float followDistance = 30.f; // Distance each particle tries to maintain from the one in front
+
+    // Create particles (lead particle + followers)
+    // std::vector<sf::CircleShape> particles(numParticles);
+    // for (int i = 0; i < numParticles; ++i) {
+    //     particles[i].setRadius(particleRadius);
+    //     particles[i].setFillColor(sf::Color::White);
+    //     particles[i].setOrigin(particleRadius, particleRadius); // Center origin for proper movement
+    //     particles[i].setPosition(400.f, 300.f + i * followDistance); // Position them initially in a vertical line
+    // }
+
+    std::vector<gameObject> centipede(11);
+    gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", 400, 300);
+    centipede.push_back(centipedeHead);
+    for(int i=0; i<10; i++)
+    {
+        gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", 400, 300 + (i+1)*20);
+        centipede.push_back(centipedeBody);
+    }
+    centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
+    centipede[0].sprite.setPosition(400, 300);
+    for(int i=1;i<11;i++)
+    {
+        centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
+        centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
+    }
+    sf::Clock clock;
 
 
     int loop_counter = 0;
     while (1)
     {
+        float deltaTime = clock.restart().asSeconds();
         loop_counter++;
         window->clear(bg);
 
@@ -329,6 +358,46 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             starship.move(0.f, 0.1f);
         }
 
+        // Control the lead particle (the first one)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+            //particles[0].move(0, -speed * deltaTime);
+            centipede[0].sprite.move(0, -200*deltaTime);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            //particles[0].move(0, speed * deltaTime);
+            centipede[0].sprite.move(0, 200*deltaTime);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            //particles[0].move(-speed * deltaTime, 0);
+            centipede[0].sprite.move(-200*deltaTime, 0);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            //particles[0].move(speed * deltaTime, 0);
+            centipede[0].sprite.move(200*deltaTime, 0);
+        }
+
+        // For each particle except the lead one, make it follow the one ahead
+        // for (int i = 1; i < numParticles; ++i) {
+        //     sf::Vector2f dir = particles[i - 1].getPosition() - particles[i].getPosition();
+        //     float dist = distance(particles[i - 1].getPosition(), particles[i].getPosition());
+
+        //     if (dist > followDistance) {
+        //         // Normalize the direction vector and move the particle towards the one ahead
+        //         particles[i].move(normalize(dir) * (speed * deltaTime));
+        //     }
+        // }
+
+        for (int i=1; i < 11; ++i)
+        {
+            sf::Vector2f dir = centipede[i-1].sprite.getPosition() - centipede[i].sprite.getPosition() ;
+            float dist = distance(centipede[i-1].sprite.getPosition(), centipede[i].sprite.getPosition());
+
+            if (dist > 20)
+            {
+                centipede[i].sprite.move(normalize(dir) * (200 * deltaTime));
+            }
+        }
+
         if(starship.collisonBox.intersects(spider.collisonBox))
         {
             starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
@@ -363,36 +432,6 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             }
         }
 
-        // for(int i=0; i<30; i++)
-        // {
-        //     if(mushrooms[i].health > 0)
-        //     {
-        //         // if(mushrooms[i].health == 1)
-        //         // {
-        //         //     mushrooms[i].obj.setTexture(MUSHROOM_HEALTH_1_TEX);
-        //         // }
-        //         window->draw(mushrooms[i].obj);
-
-        //     }
-        // }
-        // for (int i=0; i<30; i++)
-        // {
-        //     std::cout << "name: " << mushrooms[i].getName() << std::endl;
-        //     window->draw(mushrooms[i].sprite);
-        // }
-        //window->draw(mushrooms[1].sprite);
-        // auto x =  mushrooms.at(2);
-        //window->draw((*mushrooms.at(2)).sprite);
-        // for(auto x = mushrooms.begin(); x!=mushrooms.end(); x++)
-        // {
-        //     window->draw((*(*x)).sprite);
-        // }
-        // for(gameObject m : mushrooms)
-        // {
-        //     window->draw(m.sprite);
-        // std::cout << m.
-        // }
-        
         for(int i=0; i<30; i++)
         {
             window->draw(mushrooms[i].sprite);
@@ -407,6 +446,17 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         if (std::any_cast<std::int16_t>(starship.getParam("health")) > 0)
         {
             window->draw(starship.sprite);
+        }
+
+        // Draw particles
+        // for (int i = 0; i < numParticles; ++i) {
+        //     window->draw(particles[i]);
+        // }
+
+        std::cout << centipede[0].sprite.getPosition().x << ", " << centipede[0].sprite.getPosition().y << std::endl;
+        for (int i=0; i<11; i++)
+        {
+            window->draw(centipede[i].sprite);
         }
 
         window->draw(spider.sprite);
