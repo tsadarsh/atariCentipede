@@ -21,10 +21,10 @@ const int WINDOW_HEIGHT = 569;
 
 
 
-void spawnCentipedeAndAddToFamily(std::vector<centipedeGameObject>* familyContainer)
+void spawnCentipedeAndAddToFamily(std::vector<centipedeGameObject>* familyContainer, int lengthOfCentipede, float spawnX, float spawnY)
 {
     centipedeGameObject centipede;
-    centipede.spawn();
+    centipede.spawn(lengthOfCentipede, spawnX, spawnY);
     (*familyContainer).push_back(centipede);
 
     for(int i_centipede = 0; i_centipede < (*familyContainer).size(); i_centipede++)
@@ -75,7 +75,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
     // load centipede
     std::vector<centipedeGameObject> centipedeFamily;
-    spawnCentipedeAndAddToFamily(&centipedeFamily);
+    spawnCentipedeAndAddToFamily(&centipedeFamily, 12, 400, 300);
 
     sf::Clock clock;
 
@@ -191,7 +191,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             centipede_teleop_dir_y = 0;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
-            spawnCentipedeAndAddToFamily(&centipedeFamily);
+            spawnCentipedeAndAddToFamily(&centipedeFamily, 12, 400, 300);
         }
         for (int i_centipede = 0; i_centipede < centipedeFamily.size(); i_centipede++)
         {
@@ -235,8 +235,10 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         bool bb_collidedAlready = false;
                         if (centipedeFamily[i_centipedeFamily].centipede[i_body].collisonBox.contains(lasers[i_laser].getPosX(), lasers[i_laser].getPosY()))
                         {
+                            centipedeFamily[i_centipedeFamily].centipede.resize(i_body);
                             lasers[i_laser].setPosition(0, -100);
-                            spawnCentipedeAndAddToFamily(&centipedeFamily);
+                            spawnCentipedeAndAddToFamily(&centipedeFamily, 12-i_body, centipedeFamily[i_centipedeFamily].centipede[i_body].getPosX(), centipedeFamily[i_centipedeFamily].centipede[i_body].getPosY());
+                            centipedeFamily.back().speedX *= -1;
                             std::cout << i_centipedeFamily << " :Laser hit centipede!" << std::endl;
                             bb_collidedAlready = true;
                             break;

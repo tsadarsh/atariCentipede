@@ -6,22 +6,21 @@ class centipedeGameObject : public gameObject
     public:
         std::vector<gameObject> centipede;
         centipedeGameObject() : gameObject () {}
-        const int lengthOfNewCentipede = 10;
         float speedX = 0.1;
         float moveY = 40;
 
-        void spawn()
+        void spawn(int lengthOfCentipede, float spawnX, float spawnY)
         {
-            gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", 400, 300);
+            gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", spawnX, spawnY);
             centipede.push_back(centipedeHead);
-            for(int i=0; i<lengthOfNewCentipede; i++)
+            for(int i=0; i<lengthOfCentipede; i++)
             {
-                gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", 400, 300 + (i+1)*20);
+                gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", spawnX, spawnY + (i+1)*20);
                 centipede.push_back(centipedeBody);
             }
             centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
             centipede[0].sprite.setPosition(400, 300);
-            for(int i=1;i<lengthOfNewCentipede;i++)
+            for(int i=1;i<lengthOfCentipede;i++)
             {
                 centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
                 centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
