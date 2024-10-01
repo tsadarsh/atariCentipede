@@ -8,7 +8,7 @@ class centipedeGameObject : public gameObject
         centipedeGameObject() : gameObject () {}
         const int lengthOfNewCentipede = 10;
         float speedX = 0.1;
-        float speedY = 0;
+        float moveY = 40;
 
         void spawn()
         {

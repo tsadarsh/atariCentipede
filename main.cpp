@@ -101,9 +101,8 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         
         for (int i_family = 0; i_family < centipedeFamily.size(); i_family++)
         {
-            centipedeFamily[i_family].move(centipedeFamily[i_family].speedX, centipedeFamily[i_family].speedY, deltaTime);
+            centipedeFamily[i_family].move(centipedeFamily[i_family].speedX, 0, deltaTime);
         }
-
 
         if (spider.getPosX() < spider.targetX)
         {
@@ -253,6 +252,20 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                 }
                 lasers[i_laser].move(0.f, -0.1f);
                 window->draw(lasers[i_laser].sprite);
+            }
+        }
+
+        for (int i_centipede = 0; i_centipede < centipedeFamily.size(); i_centipede++)
+        {
+            if ((centipedeFamily[i_centipede].centipede[0].getPosX() > WINDOW_WIDTH) | (centipedeFamily[i_centipede].centipede[0].getPosX() < 0))
+            {
+                centipedeFamily[i_centipede].speedX *= -1;
+                centipedeFamily[i_centipede].move(0, centipedeFamily[i_centipede].moveY, deltaTime);
+            }
+            if ((centipedeFamily[i_centipede].centipede[0].getPosY() > WINDOW_HEIGHT) | (centipedeFamily[i_centipede].centipede[0].getPosY() < 0))
+            {
+                centipedeFamily[i_centipede].moveY *= -1;
+                centipedeFamily[i_centipede].move(0, centipedeFamily[i_centipede].moveY, deltaTime);
             }
         }
 
