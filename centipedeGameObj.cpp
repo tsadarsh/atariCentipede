@@ -18,16 +18,20 @@ class centipedeGameObject : public gameObject
 
         void spawn(int lengthOfCentipede, float spawnX, float spawnY)
         {
-            gameObject centipedeHead("head");
-            centipedeHead.m_sprite.setTexture(*m_textureHead);
-            centipedeHead.setPosition(spawnX, spawnY);
-            centipede.push_back(centipedeHead);
-            for(int i_body = 0; i_body < lengthOfCentipede; i_body++)
+            if (lengthOfCentipede > 0)
             {
-                gameObject centipedeBody("body" + std::to_string(i_body));
-                centipedeBody.m_sprite.setTexture(*m_textureBody);
-                centipedeBody.setPosition(spawnX, spawnY + (i_body+1)*20);
-                centipede.push_back(centipedeBody);
+                std::cout << "Generate: " << lengthOfCentipede << std::endl;
+                gameObject centipedeHead("head");
+                centipedeHead.m_sprite.setTexture(*m_textureHead);
+                centipedeHead.setPosition(spawnX, spawnY);
+                centipede.push_back(centipedeHead);
+                for(int i_body = 1; i_body < lengthOfCentipede; i_body++)
+                {
+                    gameObject centipedeBody("body" + std::to_string(i_body));
+                    centipedeBody.m_sprite.setTexture(*m_textureBody);
+                    centipedeBody.setPosition(spawnX + (i_body+1)*20, spawnY);
+                    centipede.push_back(centipedeBody);
+                }
             }
         }
 

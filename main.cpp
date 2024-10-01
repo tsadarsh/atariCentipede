@@ -25,9 +25,16 @@ sf::Texture starshipTexture, spiderTexture, mushroomHealth2Texture, mushroomHeal
 
 void spawnCentipedeAndAddToFamily(std::vector<centipedeGameObject>* familyContainer, int lengthOfCentipede, float spawnX, float spawnY)
 {
-    centipedeGameObject centipede("centipede" + (*familyContainer).size(), &centipedeHeadTexture, &centipedeBodyTexture);
-    centipede.spawn(lengthOfCentipede, spawnX, spawnY);
-    (*familyContainer).push_back(centipede);
+    if (lengthOfCentipede > 0) 
+    {
+        centipedeGameObject centipede("centipede" + (*familyContainer).size(), &centipedeHeadTexture, &centipedeBodyTexture);
+        centipede.spawn(lengthOfCentipede, spawnX, spawnY);
+        (*familyContainer).push_back(centipede);
+    }
+    else
+    {
+        std::cout << "Invalid length of centipede requested: " << lengthOfCentipede << std::endl;
+    }
 }
 
 void spawnLaserAndAddToFamily (std::vector<laserGameObj>* familyContainer, float spawnX, float spawnY)
@@ -199,6 +206,13 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             starship.m_health--;
         }
         
+        for(int i_mushroom = 0; i_mushroom < mushrooms.size(); i_mushroom++)
+        {
+            if (mushrooms[i_mushroom].m_collisonBox.intersects(spider.m_collisonBox))
+            {
+                mushrooms[i_mushroom].damage(1);
+            }
+        }
 
         for(int i_laser = 0; i_laser < lasers.size(); i_laser++)
         {
@@ -237,13 +251,13 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                                 )
                             )
                         {
-                            centipedeFamily[i_centipedeFamily].centipede.resize(i_body);
                             lasers[i_laser].setPosition(0, -100);
-                            spawnCentipedeAndAddToFamily(&centipedeFamily, 12-i_body, \
+                            spawnCentipedeAndAddToFamily(&centipedeFamily, centipedeFamily[i_centipedeFamily].centipede.size() - 1, \
                                 centipedeFamily[i_centipedeFamily].centipede[i_body].m_sprite.getPosition().x, 
                                 centipedeFamily[i_centipedeFamily].centipede[i_body].m_sprite.getPosition().y
                             );
-                            centipedeFamily.back().speedX *= -1;
+                            centipedeFamily[i_centipedeFamily].centipede.resize(i_body);
+                            centipedeFamily.back().speedX = (-1) * centipedeFamily[i_centipedeFamily].speedX;
                             std::cout << i_centipedeFamily << " :Laser hit centipede!" << std::endl;
                             bb_collidedAlready = true;
                             break;
