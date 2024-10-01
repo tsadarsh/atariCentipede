@@ -290,6 +290,15 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                 centipedeFamily[i_centipede].moveY *= -1;
                 centipedeFamily[i_centipede].move(0, centipedeFamily[i_centipede].moveY, deltaTime);
             }
+            
+            for (int i_mushroom = 0; i_mushroom < mushrooms.size(); i_mushroom++)
+            {
+                if (mushrooms[i_mushroom].health > 0 & centipedeFamily[i_centipede].centipede[0].m_collisonBox.intersects(mushrooms[i_mushroom].m_collisonBox)) 
+                {
+                    centipedeFamily[i_centipede].speedX *= -1;
+                    //centipedeFamily[i_centipede].move(0, centipedeFamily[i_centipede].moveY, deltaTime);
+                }
+            }
         }
 
         for(int i=0; i<30; i++)

@@ -15,7 +15,7 @@ class gameObject
         sf::IntRect m_collisonBox;
 
         bool m_collisionEnabled = true;
-        float m_collisionPadding = 10;
+        float m_collisionPadding = 2;
 
         gameObject () {}
 
