@@ -5,25 +5,29 @@ class centipedeGameObject : public gameObject
 {
     public:
         std::vector<gameObject> centipede;
-        centipedeGameObject() : gameObject () {}
         float speedX = 0.1;
         float moveY = 40;
+        sf::Texture m_textureHead;
+        sf::Texture m_textureBody;
+
+        centipedeGameObject(std::string name, sf::Texture textureHead, sf::Texture textureBody) : gameObject (name) 
+        {
+            m_textureHead = textureHead;
+            m_textureBody = textureBody;
+        }
 
         void spawn(int lengthOfCentipede, float spawnX, float spawnY)
         {
-            gameObject centipedeHead("centipedeHead", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png", spawnX, spawnY);
+            gameObject centipedeHead("head");
+            centipedeHead.m_sprite.setTexture(m_textureHead);
+            centipedeHead.setPosition(spawnX, spawnY);
             centipede.push_back(centipedeHead);
-            for(int i=0; i<lengthOfCentipede; i++)
+            for(int i_body = 0; i_body < lengthOfCentipede; i_body++)
             {
-                gameObject centipedeBody("centipedeBody"+std::to_string(i), "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png", spawnX, spawnY + (i+1)*20);
+                gameObject centipedeBody("body" + std::to_string(i_body));
+                centipedeBody.m_sprite.setTexture(m_textureBody);
+                centipedeBody.setPosition(spawnX, spawnY + (i_body+1)*20);
                 centipede.push_back(centipedeBody);
-            }
-            centipede[0].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png");
-            centipede[0].sprite.setPosition(400, 300);
-            for(int i=1;i<lengthOfCentipede;i++)
-            {
-                centipede[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
-                centipede[i].sprite.setPosition(400, 300 + (i+1)*20);
             }
         }
 
@@ -32,8 +36,8 @@ class centipedeGameObject : public gameObject
             centipede[0].move(offsetX, offsetY);
             for (int i_body=1; i_body < centipede.size(); i_body++)
             {
-                sf::Vector2f dir = centipede[i_body-1].sprite.getPosition() - centipede[i_body].sprite.getPosition() ;
-                float dist = distance(centipede[i_body-1].sprite.getPosition(), centipede[i_body].sprite.getPosition());
+                sf::Vector2f dir = centipede[i_body-1].m_sprite.getPosition() - centipede[i_body].m_sprite.getPosition() ;
+                float dist = distance(centipede[i_body-1].m_sprite.getPosition(), centipede[i_body].m_sprite.getPosition());
 
                 if (dist > 20)
                 {

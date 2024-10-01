@@ -4,8 +4,15 @@ class mushroomGameObj : public gameObject
 {
     public:
         int health = 2;
+        sf::Texture m_textureHealth2;
+        sf::Texture m_textureHealth1;
 
-        mushroomGameObj(std::string name, std::string textureFilePath, float posX, float posY) : gameObject(name, textureFilePath, posX, posY) {}
+        mushroomGameObj(std::string name, sf::Texture textureHealth2, sf::Texture textureHealth1) : gameObject(name) 
+        {
+            m_textureHealth2 = textureHealth2;
+            m_textureHealth1 = textureHealth1;
+            m_sprite.setTexture(textureHealth2);
+        }
 
         void damage(int pts)
         {
@@ -13,11 +20,11 @@ class mushroomGameObj : public gameObject
             switch (health)
             {
             case 2:
-                updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
+                m_sprite.setTexture(m_textureHealth2);
                 break;
             
             case 1:
-                updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom1.png");
+                m_sprite.setTexture(m_textureHealth1);
                 break;
             
             case 0:
@@ -29,30 +36,3 @@ class mushroomGameObj : public gameObject
             }
         }
 };
-
-
-// class mushroomGameObj : public gameObject
-// {
-//     public:
-//         int population;
-//         gameObject* instances_arr;
-//         sf::Texture tex;
-
-//         mushroomGameObj(std::string name, std::string textureFilePath) : gameObject(name, textureFilePath) {
-            
-//         }
-
-//         void populateRandomly(int population, sf::IntRect area)
-//         {
-//             this->population = population;
-//             gameObject instances[population];
-//             for (int i=0; i < this->population; i++)
-//             {
-//                 instances[i].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png");
-//                 instances[i].setPosition(rand(), rand());   
-//             }
-//             instances_arr = new gameObject[population];
-//             std::copy(&instances, &instances+population, &instances_arr, &instances_arr+population);
-//         }
-
-// };
