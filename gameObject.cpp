@@ -99,6 +99,11 @@ class gameObject
             this->loadTexture(textureFilePath);
             this->sprite.setTexture(this->texture);
         }
+        void updateTexture (std::string textureFilePath, sf::IntRect area)
+        {
+            this->loadTexture(textureFilePath, area);
+            this->sprite.setTexture(this->texture);
+        }
         std::string getName()
         {
             return this->name;

@@ -20,6 +20,22 @@ const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
 
 
+
+void spawnCentipedeAndAddToFamily(std::vector<centipedeGameObject>* familyContainer)
+{
+    centipedeGameObject centipede;
+    centipede.spawn();
+    (*familyContainer).push_back(centipede);
+
+    for(int i_centipede = 0; i_centipede < (*familyContainer).size(); i_centipede++)
+    {
+        for(int i_body = 0; i_body < (*familyContainer).back().centipede.size(); i_body++)
+        {
+            (*familyContainer)[i_centipede].centipede[i_body].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
+        }
+    }
+}
+
 void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 {
     window->setKeyRepeatEnabled(false);
@@ -56,17 +72,20 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     gameObject laser("laser", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20));
     std::vector <gameObject> lasers;
 
-    centipedeGameObject centipede;
-    centipede.spawnNew();
-    for(int i_body=0; i_body<centipede.family.back().size(); i_body++)
-    {
-        centipede.family.back()[i_body].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
-    }
+
+    // load centipede
+    std::vector<centipedeGameObject> centipedeFamily;
+    spawnCentipedeAndAddToFamily(&centipedeFamily);
 
     sf::Clock clock;
 
 
     int loop_counter = 0;
+
+    float c_moveDir_x = -0.1;
+    float c_moveDir_y = 0;
+    float c_moveSpeed = 1;
+
     while (1)
     {
         float deltaTime = clock.restart().asSeconds();
@@ -80,6 +99,12 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
             spider.targetY = (rand() % (WINDOW_HEIGHT/2 - 20 - WINDOW_HEIGHT + 1)) + WINDOW_HEIGHT/2;
         }
         
+        for (int i_family = 0; i_family < centipedeFamily.size(); i_family++)
+        {
+            centipedeFamily[i_family].move(centipedeFamily[i_family].speedX, centipedeFamily[i_family].speedY, deltaTime);
+        }
+
+
         if (spider.getPosX() < spider.targetX)
         {
             spider.move(spider.speed, 0);
@@ -115,8 +140,8 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         if (event.key.code == sf::Keyboard::Space)
                         {
                             gameObject laser("laser", "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png", sf::IntRect(10, 10, 3, 20));
+                            laser.setPosition(starship.getPosX(), starship.getPosY());
                             lasers.push_back(laser);
-                            lasers.back().setPosition(starship.getPosX(), starship.getPosY());  
                         }
                     }
                     break;
@@ -147,24 +172,31 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         }
 
         // Control the lead particle (the first one)
+        float centipede_teleop_dir_x = 0;
+        float centipede_teleop_dir_y = 0;
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-            centipede.move(0, -200*deltaTime, deltaTime);
+            centipede_teleop_dir_x = 0;
+            centipede_teleop_dir_y = -200*deltaTime;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            centipede.move(0, 200*deltaTime, deltaTime);
+            centipede_teleop_dir_x = 0;
+            centipede_teleop_dir_y = 200*deltaTime;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            centipede.move(-200*deltaTime, 0, deltaTime);
+            centipede_teleop_dir_x = -200*deltaTime;
+            centipede_teleop_dir_y = 0;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            centipede.move(200*deltaTime, 0, deltaTime);
+            centipede_teleop_dir_x = 200*deltaTime;
+            centipede_teleop_dir_y = 0;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
-            centipede.spawnNew();
-            for(int i_body=0; i_body<centipede.family.back().size(); i_body++)
-            {
-                centipede.family.back()[i_body].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
-            }
+            spawnCentipedeAndAddToFamily(&centipedeFamily);
+        }
+        for (int i_centipede = 0; i_centipede < centipedeFamily.size(); i_centipede++)
+        {
+            centipedeFamily[i_centipede].move(centipede_teleop_dir_x, centipede_teleop_dir_y, deltaTime);
         }
 
 
@@ -196,20 +228,16 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                     spider.setPosition(900, 400);
                 }
 
-                for (int i_centipedeFamily = 0; i_centipedeFamily < centipede.family.size(); i_centipedeFamily++)
+                for (int i_centipedeFamily = 0; i_centipedeFamily < centipedeFamily.size(); i_centipedeFamily++)
                 {
                     bool b_collidedAlready = false;
-                    for (int i_body = 0; i_body < centipede.family[i_centipedeFamily].size(); i_body++)
+                    for (int i_body = 0; i_body < centipedeFamily[i_centipedeFamily].centipede.size(); i_body++)
                     {
                         bool bb_collidedAlready = false;
-                        if (centipede.family[i_centipedeFamily][i_body].collisonBox.contains(lasers[i_laser].getPosX(), lasers[i_laser].getPosY()))
+                        if (centipedeFamily[i_centipedeFamily].centipede[i_body].collisonBox.contains(lasers[i_laser].getPosX(), lasers[i_laser].getPosY()))
                         {
                             lasers[i_laser].setPosition(0, -100);
-                            centipede.spawnNew();
-                            for(int ii_body=0; ii_body<centipede.family.back().size(); ii_body++)
-                            {
-                                centipede.family.back()[ii_body].updateTexture("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png");
-                            }
+                            spawnCentipedeAndAddToFamily(&centipedeFamily);
                             std::cout << i_centipedeFamily << " :Laser hit centipede!" << std::endl;
                             bb_collidedAlready = true;
                             break;
@@ -239,11 +267,11 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         }
 
         // std::cout << centipede.family[0][0].sprite.getPosition().x << ", " << centipede.family[0][0].collisonBox.left << std::endl;
-        for (int i_family = 0; i_family < centipede.family.size(); i_family++)
+        for (int i_family = 0; i_family < centipedeFamily.size(); i_family++)
         {
-            for (int i_body=0; i_body < centipede.family[i_family].size(); i_body++)
+            for (int i_body=0; i_body < centipedeFamily[i_family].centipede.size(); i_body++)
             {
-                window->draw(centipede.family[i_family][i_body].sprite);
+                window->draw(centipedeFamily[i_family].centipede[i_body].sprite);
             }
         }
         window->draw(spider.sprite);
