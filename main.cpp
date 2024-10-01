@@ -25,14 +25,14 @@ sf::Texture starshipTexture, spiderTexture, mushroomHealth2Texture, mushroomHeal
 
 void spawnCentipedeAndAddToFamily(std::vector<centipedeGameObject>* familyContainer, int lengthOfCentipede, float spawnX, float spawnY)
 {
-    centipedeGameObject centipede("centipede" + (*familyContainer).size(), centipedeHeadTexture, centipedeBodyTexture);
+    centipedeGameObject centipede("centipede" + (*familyContainer).size(), &centipedeHeadTexture, &centipedeBodyTexture);
     centipede.spawn(lengthOfCentipede, spawnX, spawnY);
     (*familyContainer).push_back(centipede);
 }
 
 void spawnLaserAndAddToFamily (std::vector<laserGameObj>* familyContainer, float spawnX, float spawnY)
 {
-    laserGameObj laser("laser" + (*familyContainer).size(), laserTexture);
+    laserGameObj laser("laser" + (*familyContainer).size(), &laserTexture);
     laser.m_sprite.setPosition(spawnX, spawnY);
     (*familyContainer).push_back(laser);
 }
@@ -42,9 +42,9 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     window->setKeyRepeatEnabled(false);
     window->clear(sf::Color::White);
 
-    starshipGameObj starship("startship", starshipTexture);
+    starshipGameObj starship("startship", &starshipTexture);
 
-    spiderGameObj spider("spider", spiderTexture);
+    spiderGameObj spider("spider", &spiderTexture);
     spider.setPosition(900, 400);
     spider.targetX = rand() % (WINDOW_WIDTH - 20 + 1);
     spider.targetY = (rand() % (WINDOW_HEIGHT / 2 - 20 + 1)) + WINDOW_HEIGHT / 2;
@@ -60,7 +60,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     std::vector<mushroomGameObj> mushrooms;
     for(int i=0; i<30; i++)
     {
-        mushroomGameObj mushroom("mushroom"+std::to_string(i), mushroomHealth2Texture, mushroomHealth1Texture);
+        mushroomGameObj mushroom("mushroom"+std::to_string(i), &mushroomHealth2Texture, &mushroomHealth1Texture);
         mushroom.setPosition(mushroom_pos_x(rng), mushroom_pos_y(rng));
         mushrooms.push_back(mushroom);
     }

@@ -7,10 +7,10 @@ class centipedeGameObject : public gameObject
         std::vector<gameObject> centipede;
         float speedX = 0.1;
         float moveY = 40;
-        sf::Texture m_textureHead;
-        sf::Texture m_textureBody;
+        sf::Texture *m_textureHead;
+        sf::Texture *m_textureBody;
 
-        centipedeGameObject(std::string name, sf::Texture textureHead, sf::Texture textureBody) : gameObject (name) 
+        centipedeGameObject(std::string name, sf::Texture *textureHead, sf::Texture *textureBody) : gameObject (name) 
         {
             m_textureHead = textureHead;
             m_textureBody = textureBody;
@@ -19,13 +19,13 @@ class centipedeGameObject : public gameObject
         void spawn(int lengthOfCentipede, float spawnX, float spawnY)
         {
             gameObject centipedeHead("head");
-            centipedeHead.m_sprite.setTexture(m_textureHead);
+            centipedeHead.m_sprite.setTexture(*m_textureHead);
             centipedeHead.setPosition(spawnX, spawnY);
             centipede.push_back(centipedeHead);
             for(int i_body = 0; i_body < lengthOfCentipede; i_body++)
             {
                 gameObject centipedeBody("body" + std::to_string(i_body));
-                centipedeBody.m_sprite.setTexture(m_textureBody);
+                centipedeBody.m_sprite.setTexture(*m_textureBody);
                 centipedeBody.setPosition(spawnX, spawnY + (i_body+1)*20);
                 centipede.push_back(centipedeBody);
             }

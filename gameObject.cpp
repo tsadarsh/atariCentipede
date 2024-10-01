@@ -18,7 +18,7 @@ class gameObject
         float m_collisionPadding = 10;
 
         gameObject () {}
-        
+
         gameObject (std::string name)
         {
             m_name = name;

@@ -3,8 +3,8 @@
 class laserGameObj : public gameObject
 {
     public: 
-        laserGameObj (std::string name, sf::Texture texture) : gameObject (name)
+        laserGameObj (std::string name, sf::Texture* texture) : gameObject (name)
         {
-            m_sprite.setTexture(texture);
+            m_sprite.setTexture(*texture);
         }
 };

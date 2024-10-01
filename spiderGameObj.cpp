@@ -8,8 +8,8 @@ class spiderGameObj : public gameObject
         float speed;
         const int NEW_TARGET_POS_DELTA = 400;
     
-        spiderGameObj(std::string name, sf::Texture texture) : gameObject(name) 
+        spiderGameObj(std::string name, sf::Texture *texture) : gameObject(name) 
         {
-            m_sprite.setTexture(texture);
+            m_sprite.setTexture(*texture);
         }
 };
