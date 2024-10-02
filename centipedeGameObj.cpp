@@ -9,6 +9,7 @@ class centipedeGameObject : public gameObject
         float moveY = 40;
         sf::Texture *m_textureHead;
         sf::Texture *m_textureBody;
+        sf::Sprite ECE_Centipede;
 
         centipedeGameObject(std::string name, sf::Texture *textureHead, sf::Texture *textureBody) : gameObject (name) 
         {
@@ -20,6 +21,7 @@ class centipedeGameObject : public gameObject
         {
             if (lengthOfCentipede > 0)
             {
+                ECE_Centipede = m_sprite;
                 std::cout << "Generate: " << lengthOfCentipede << std::endl;
                 gameObject centipedeHead("head");
                 centipedeHead.m_sprite.setTexture(*m_textureHead);

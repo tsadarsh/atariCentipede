@@ -5,6 +5,7 @@
 #include <iostream>
 #include <time.h>
 #include <algorithm>
+#include <random>
 #include <boost/random.hpp>
 #include <any>
 #include <list>
@@ -23,7 +24,7 @@ void homeScreen();
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
 sf::Texture starshipTexture, spiderTexture, mushroomHealth2Texture, mushroomHealth1Texture, laserTexture, centipedeHeadTexture, centipedeBodyTexture;
-
+sf::Font font;
 
 void spawnCentipedeAndAddToFamily(std::vector<centipedeGameObject>* familyContainer, int lengthOfCentipede, float spawnX, float spawnY)
 {
@@ -48,6 +49,16 @@ void spawnLaserAndAddToFamily (std::vector<laserGameObj>* familyContainer, float
 
 void beginGameSequence()
 {
+    sf::Text text;
+    text.setFont(font); // font is a sf::Font
+    text.setPosition(WINDOW_WIDTH / 2, 20);
+
+    // set the character size
+    text.setCharacterSize(35); // in pixels, not points!
+
+    // set the color
+    text.setFillColor(sf::Color::White);
+    int points = 0;
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
     sf::Event event;
     window.setKeyRepeatEnabled(false);
@@ -62,10 +73,13 @@ void beginGameSequence()
     spider.speed = 0.1;
    
     sf::Color bg(10,24,26);
-    boost::random::mt19937 rng;
-    boost::random::uniform_int_distribution<> four_steps(-10, 10);
-    boost::random::uniform_int_distribution<> mushroom_pos_x(20, WINDOW_WIDTH);
-    boost::random::uniform_int_distribution<> mushroom_pos_y(40, WINDOW_HEIGHT);
+    // boost::random::mt19937 rng;
+    // boost::random::uniform_int_distribution<> four_steps(-10, 10);
+    // boost::random::uniform_int_distribution<> mushroom_pos_x(20, WINDOW_WIDTH - 20);
+    // boost::random::uniform_int_distribution<> mushroom_pos_y(50, WINDOW_HEIGHT - 75);
+    std::default_random_engine rng;
+    std::uniform_int_distribution<int> mushroom_pos_x(20, WINDOW_WIDTH - 20);
+    std::uniform_int_distribution<int> mushroom_pos_y(50, WINDOW_HEIGHT - 75);
 
     // load mushroom
     std::vector<mushroomGameObj> mushrooms;
@@ -81,7 +95,7 @@ void beginGameSequence()
 
     // load centipede
     std::vector<centipedeGameObject> centipedeFamily;
-    spawnCentipedeAndAddToFamily(&centipedeFamily, 12, WINDOW_WIDTH - 250, 40);
+    spawnCentipedeAndAddToFamily(&centipedeFamily, 12, WINDOW_WIDTH - 250, 50);
 
     sf::Clock clock;
 
@@ -97,6 +111,7 @@ void beginGameSequence()
 
     while (1)
     {
+        text.setString(std::to_string(points));
         float deltaTime = clock.restart().asSeconds();
         loop_counter++;
         window.clear(bg);
@@ -177,6 +192,14 @@ void beginGameSequence()
         {
             starship.move(0.f, 0.1f);
         }
+        if (starship.m_sprite.getPosition().x > WINDOW_WIDTH - 20)
+            starship.setPosition(WINDOW_WIDTH - 20, starship.m_sprite.getPosition().y);
+        if (starship.m_sprite.getPosition().x < 20)
+            starship.setPosition(20, starship.m_sprite.getPosition().y);
+        if (starship.m_sprite.getPosition().y < WINDOW_HEIGHT / 2)
+            starship.setPosition(starship.m_sprite.getPosition().x, WINDOW_HEIGHT / 2);
+        if (starship.m_sprite.getPosition().y > WINDOW_HEIGHT - 20)
+            starship.setPosition(starship.m_sprite.getPosition().x, WINDOW_HEIGHT - 20);
 
         // Control the lead particle (the first one)
         float centipede_teleop_dir_x = 0;
@@ -236,6 +259,7 @@ void beginGameSequence()
                     )
                     {
                         mushrooms[i_mushroom].damage(1);
+                        points += 100;
                         lasers[i_laser].setPosition(0, -100);
                     }
                 }
@@ -243,6 +267,7 @@ void beginGameSequence()
                 if (spider.m_collisonBox.contains(lasers[i_laser].m_sprite.getPosition().x, lasers[i_laser].m_sprite.getPosition().y))
                 {
                     std::cout << "Spider Killed!" << std::endl;
+                    points += 100;
                     spider.setPosition(900, 400);
                 }
 
@@ -259,6 +284,7 @@ void beginGameSequence()
                                 )
                             )
                         {
+                            points += 100;
                             lasers[i_laser].setPosition(0, -100);
                             spawnCentipedeAndAddToFamily(&centipedeFamily, centipedeFamily[i_centipedeFamily].centipede.size() - 1, \
                                 centipedeFamily[i_centipedeFamily].centipede[i_body].m_sprite.getPosition().x, 
@@ -293,12 +319,16 @@ void beginGameSequence()
                 centipedeFamily[i_centipede].move(0, centipedeFamily[i_centipede].moveY, deltaTime);
             }
             if ((centipedeFamily[i_centipede].centipede[0].m_sprite.getPosition().y > WINDOW_HEIGHT) \
-                | (centipedeFamily[i_centipede].centipede[0].m_sprite.getPosition().y < 0))
+                | (centipedeFamily[i_centipede].centipede[0].m_sprite.getPosition().y < 50))
             {
                 centipedeFamily[i_centipede].moveY *= -1;
                 centipedeFamily[i_centipede].move(0, centipedeFamily[i_centipede].moveY, deltaTime);
             }
-            
+            if (centipedeFamily[i_centipede].centipede[0].m_collisonBox.intersects(starship.m_collisonBox))
+            {
+                starship.setPosition(WINDOW_WIDTH/2, WINDOW_HEIGHT-30);
+                starship.m_health--;
+            }
             for (int i_mushroom = 0; i_mushroom < mushrooms.size(); i_mushroom++)
             {
                 if (mushrooms[i_mushroom].health > 0 & centipedeFamily[i_centipede].centipede[0].m_collisonBox.intersects(mushrooms[i_mushroom].m_collisonBox)) 
@@ -339,6 +369,7 @@ void beginGameSequence()
             window.draw(lives[i]);
         }
 
+        window.draw(text);
         window.display();
     }
 }
@@ -361,7 +392,10 @@ void homeScreen ()
         {
             // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                return;
+            }
             
             if (event.type == sf::Event::KeyPressed)
             {
@@ -389,7 +423,12 @@ void homeScreen ()
 int main()
 {   
     srand(time(NULL));
-    // create the window
+
+    // load fonts and textures
+    if(!font.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/font.ttf"))
+    {
+        std::cout << "Unable to load font" << std::endl;
+    }
 
     if(!starshipTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
     {
