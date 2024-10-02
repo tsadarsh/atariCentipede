@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/Lab1.dir/main.cpp.o -o Lab1  -lsfml-graphics -lsfml-window -lsfml-system 
+/usr/bin/c++ CMakeFiles/Lab1.dir/code/main.cpp.o -o Lab1  -lsfml-graphics -lsfml-window -lsfml-system 

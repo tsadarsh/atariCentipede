@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/main.cpp" "CMakeFiles/Lab1.dir/main.cpp.o" "gcc" "CMakeFiles/Lab1.dir/main.cpp.o.d"
+  "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/code/main.cpp" "CMakeFiles/Lab1.dir/code/main.cpp.o" "gcc" "CMakeFiles/Lab1.dir/code/main.cpp.o.d"
   )
 
 # Targets to which this target links.

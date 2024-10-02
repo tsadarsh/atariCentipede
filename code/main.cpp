@@ -21,6 +21,7 @@
 
 void homeScreen();
 
+const std::string projectFilePath = "/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1";
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
 sf::Texture starshipTexture, spiderTexture, mushroomHealth2Texture, mushroomHealth1Texture, laserTexture, centipedeHeadTexture, centipedeBodyTexture;
@@ -381,7 +382,7 @@ void homeScreen ()
     while (window.isOpen())
     {
         sf::Texture texture;
-        if (!texture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/startup_screen_background.png"))
+        if (!texture.loadFromFile(projectFilePath + "/graphics/startup_screen_background.png"))
         {
             std::cout << "No texture found!";
         }
@@ -425,42 +426,42 @@ int main()
     srand(time(NULL));
 
     // load fonts and textures
-    if(!font.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/font.ttf"))
+    if(!font.loadFromFile(projectFilePath + "/graphics/font.ttf"))
     {
         std::cout << "Unable to load font" << std::endl;
     }
 
-    if(!starshipTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
+    if(!starshipTexture.loadFromFile(projectFilePath + "/graphics/StarShip.png"))
     {
         std::cout << "Error loading starship texture" << std::endl;
     }
 
-    if(!spiderTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/spider.png"))
+    if(!spiderTexture.loadFromFile(projectFilePath + "/graphics/spider.png"))
     {
         std::cout << "Error loading spider texture" << std::endl;
     }
 
-    if(!mushroomHealth2Texture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom0.png"))
+    if(!mushroomHealth2Texture.loadFromFile(projectFilePath + "/graphics/Mushroom0.png"))
     {
         std::cout << "Error loading musgroomHealth2 texture" << std::endl;
     }
 
-    if(!mushroomHealth1Texture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/Mushroom1.png"))
+    if(!mushroomHealth1Texture.loadFromFile(projectFilePath + "/graphics/Mushroom1.png"))
     {
         std::cout << "Error loading mushroomHealth1 texture" << std::endl;
     }
         
-    if(!laserTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/laser.png",sf::IntRect(10, 10, 3, 20)))
+    if(!laserTexture.loadFromFile(projectFilePath + "/graphics/laser.png",sf::IntRect(10, 10, 3, 20)))
     {
         std::cout << "Error loading laser texture" << std::endl;
     }
 
-    if(!centipedeHeadTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeHead.png"))
+    if(!centipedeHeadTexture.loadFromFile(projectFilePath + "/graphics/CentipedeHead.png"))
     {
         std::cout << "Error loading centipedeHeadTexture texture" << std::endl;
     }
 
-    if(!centipedeBodyTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/CentipedeBody.png"))
+    if(!centipedeBodyTexture.loadFromFile(projectFilePath + "/graphics/CentipedeBody.png"))
     {
         std::cout << "Error loading centipedeBodyTexture texture" << std::endl;
     }

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++
 CXX_DEFINES = 
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites
 
 CXX_FLAGS = -g
 

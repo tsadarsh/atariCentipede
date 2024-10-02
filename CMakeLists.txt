@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(Lab1 VERSION 0.1.0 LANGUAGES C CXX)
 
-add_executable(Lab1 main.cpp)
+add_executable(Lab1 code/main.cpp)
 
 #find_package(SFML COMPONENTS graphics window system)
 find_package(Boost REQUIRED COMPONENTS random)
+target_include_directories(Lab1 PUBLIC sprites)
 target_link_libraries(Lab1 sfml-graphics sfml-window sfml-system)
 

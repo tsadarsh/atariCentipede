@@ -69,28 +69,28 @@ include CMakeFiles/Lab1.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Lab1.dir/flags.make
 
-CMakeFiles/Lab1.dir/main.cpp.o: CMakeFiles/Lab1.dir/flags.make
-CMakeFiles/Lab1.dir/main.cpp.o: ../../../main.cpp
-CMakeFiles/Lab1.dir/main.cpp.o: CMakeFiles/Lab1.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/out/build/GCC 11.4.0 x86_64-linux-gnu/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Lab1.dir/main.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Lab1.dir/main.cpp.o -MF CMakeFiles/Lab1.dir/main.cpp.o.d -o CMakeFiles/Lab1.dir/main.cpp.o -c /home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/main.cpp
+CMakeFiles/Lab1.dir/code/main.cpp.o: CMakeFiles/Lab1.dir/flags.make
+CMakeFiles/Lab1.dir/code/main.cpp.o: ../../../code/main.cpp
+CMakeFiles/Lab1.dir/code/main.cpp.o: CMakeFiles/Lab1.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/out/build/GCC 11.4.0 x86_64-linux-gnu/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Lab1.dir/code/main.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Lab1.dir/code/main.cpp.o -MF CMakeFiles/Lab1.dir/code/main.cpp.o.d -o CMakeFiles/Lab1.dir/code/main.cpp.o -c /home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/code/main.cpp
 
-CMakeFiles/Lab1.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Lab1.dir/main.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/main.cpp > CMakeFiles/Lab1.dir/main.cpp.i
+CMakeFiles/Lab1.dir/code/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Lab1.dir/code/main.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/code/main.cpp > CMakeFiles/Lab1.dir/code/main.cpp.i
 
-CMakeFiles/Lab1.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Lab1.dir/main.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/main.cpp -o CMakeFiles/Lab1.dir/main.cpp.s
+CMakeFiles/Lab1.dir/code/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Lab1.dir/code/main.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/code/main.cpp -o CMakeFiles/Lab1.dir/code/main.cpp.s
 
 # Object files for target Lab1
 Lab1_OBJECTS = \
-"CMakeFiles/Lab1.dir/main.cpp.o"
+"CMakeFiles/Lab1.dir/code/main.cpp.o"
 
 # External object files for target Lab1
 Lab1_EXTERNAL_OBJECTS =
 
-Lab1: CMakeFiles/Lab1.dir/main.cpp.o
+Lab1: CMakeFiles/Lab1.dir/code/main.cpp.o
 Lab1: CMakeFiles/Lab1.dir/build.make
 Lab1: CMakeFiles/Lab1.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/out/build/GCC 11.4.0 x86_64-linux-gnu/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Lab1"

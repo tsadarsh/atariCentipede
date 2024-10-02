@@ -129,29 +129,29 @@ Lab1/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/build
 .PHONY : Lab1/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+code/main.o: code/main.cpp.o
+.PHONY : code/main.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/main.cpp.o
-.PHONY : main.cpp.o
+code/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/code/main.cpp.o
+.PHONY : code/main.cpp.o
 
-main.i: main.cpp.i
-.PHONY : main.i
+code/main.i: code/main.cpp.i
+.PHONY : code/main.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/main.cpp.i
-.PHONY : main.cpp.i
+code/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/code/main.cpp.i
+.PHONY : code/main.cpp.i
 
-main.s: main.cpp.s
-.PHONY : main.s
+code/main.s: code/main.cpp.s
+.PHONY : code/main.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/main.cpp.s
-.PHONY : main.cpp.s
+code/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Lab1.dir/build.make CMakeFiles/Lab1.dir/code/main.cpp.s
+.PHONY : code/main.cpp.s
 
 # Help Target
 help:
@@ -162,9 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Lab1"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... code/main.o"
+	@echo "... code/main.i"
+	@echo "... code/main.s"
 .PHONY : help
 
 
