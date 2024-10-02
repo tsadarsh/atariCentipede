@@ -5,7 +5,7 @@ class centipedeGameObject : public gameObject
 {
     public:
         std::vector<gameObject> centipede;
-        float speedX = 0.1;
+        float speedX = -0.1;
         float moveY = 40;
         sf::Texture *m_textureHead;
         sf::Texture *m_textureBody;

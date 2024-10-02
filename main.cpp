@@ -18,6 +18,8 @@
 #include "laserGameObj.cpp"
 #include "centipedeGameObj.cpp"
 
+void homeScreen();
+
 const int WINDOW_WIDTH = 1036;
 const int WINDOW_HEIGHT = 569;
 sf::Texture starshipTexture, spiderTexture, mushroomHealth2Texture, mushroomHealth1Texture, laserTexture, centipedeHeadTexture, centipedeBodyTexture;
@@ -44,10 +46,12 @@ void spawnLaserAndAddToFamily (std::vector<laserGameObj>* familyContainer, float
     (*familyContainer).push_back(laser);
 }
 
-void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
+void beginGameSequence()
 {
-    window->setKeyRepeatEnabled(false);
-    window->clear(sf::Color::White);
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
+    sf::Event event;
+    window.setKeyRepeatEnabled(false);
+    window.clear(sf::Color::White);
 
     starshipGameObj starship("startship", &starshipTexture);
 
@@ -60,8 +64,8 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
     sf::Color bg(10,24,26);
     boost::random::mt19937 rng;
     boost::random::uniform_int_distribution<> four_steps(-10, 10);
-    boost::random::uniform_int_distribution<> mushroom_pos_x(0, WINDOW_WIDTH);
-    boost::random::uniform_int_distribution<> mushroom_pos_y(0, WINDOW_HEIGHT);
+    boost::random::uniform_int_distribution<> mushroom_pos_x(20, WINDOW_WIDTH);
+    boost::random::uniform_int_distribution<> mushroom_pos_y(40, WINDOW_HEIGHT);
 
     // load mushroom
     std::vector<mushroomGameObj> mushrooms;
@@ -77,22 +81,25 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
     // load centipede
     std::vector<centipedeGameObject> centipedeFamily;
-    spawnCentipedeAndAddToFamily(&centipedeFamily, 12, 400, 300);
+    spawnCentipedeAndAddToFamily(&centipedeFamily, 12, WINDOW_WIDTH - 250, 40);
 
     sf::Clock clock;
 
 
     int loop_counter = 0;
 
-    float c_moveDir_x = -0.1;
-    float c_moveDir_y = 0;
-    float c_moveSpeed = 1;
+    sf::Sprite lives[3];
+    for (int i = 0; i < 3; i++)
+    {
+        lives[i].setTexture(starshipTexture);
+        lives[i].setPosition(WINDOW_WIDTH / 2 + 100 + (i * 20), 20);
+    }
 
     while (1)
     {
         float deltaTime = clock.restart().asSeconds();
         loop_counter++;
-        window->clear(bg);
+        window.clear(bg);
 
         if (loop_counter == spider.NEW_TARGET_POS_DELTA)
         {
@@ -124,14 +131,15 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         }
 
         sf::Event event;
-        while (window->pollEvent(event))
+        while (window.pollEvent(event))
         {
             // check the type of the event...
             switch (event.type)
             {
                 // window closed
                 case sf::Event::Closed:
-                    window->close();
+                    window.close();
+                    return;
                     break;
 
                 // key pressed
@@ -272,7 +280,7 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
                         break;
                 }
                 lasers[i_laser].move(0.f, -0.1f);
-                window->draw(lasers[i_laser].m_sprite);
+                window.draw(lasers[i_laser].m_sprite);
             }
         }
 
@@ -303,12 +311,17 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
 
         for(int i=0; i<30; i++)
         {
-            window->draw(mushrooms[i].m_sprite);
+            window.draw(mushrooms[i].m_sprite);
         }
 
         if (starship.m_health > 0)
         {
-            window->draw(starship.m_sprite);
+            window.draw(starship.m_sprite);
+        }
+        else
+        {
+            window.close();
+            homeScreen();
         }
 
         // std::cout << centipede.family[0][0].sprite.getPosition().x << ", " << centipede.family[0][0].collisonBox.left << std::endl;
@@ -316,11 +329,60 @@ void beginGameSequence(sf::RenderWindow* window, sf::Event* event)
         {
             for (int i_body=0; i_body < centipedeFamily[i_family].centipede.size(); i_body++)
             {
-                window->draw(centipedeFamily[i_family].centipede[i_body].m_sprite);
+                window.draw(centipedeFamily[i_family].centipede[i_body].m_sprite);
             }
         }
-        window->draw(spider.m_sprite);
-        window->display();
+        window.draw(spider.m_sprite);
+
+        for (int i = 0; i < starship.m_health; i++)
+        {
+            window.draw(lives[i]);
+        }
+
+        window.display();
+    }
+}
+
+void homeScreen () 
+{
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
+ // run the program as long as the window is open
+    while (window.isOpen())
+    {
+        sf::Texture texture;
+        if (!texture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/startup_screen_background.png"))
+        {
+            std::cout << "No texture found!";
+        }
+
+        // check all the window's events that were triggered since the last iteration of the loop
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            // "close requested" event: we close the window
+            if (event.type == sf::Event::Closed)
+                window.close();
+            
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Enter)
+                {
+                    std::cout << "Enter key pressed" << std::endl;
+                    window.close();
+                    beginGameSequence();
+                }
+            }
+        }
+
+        // clear the window with black color
+        window.clear(sf::Color::Black);
+
+        sf::Sprite sprite;
+        sprite.setTexture(texture);
+        window.draw(sprite);
+
+        // end the current frame
+        window.display();
     }
 }
 
@@ -328,7 +390,6 @@ int main()
 {   
     srand(time(NULL));
     // create the window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "My window");
 
     if(!starshipTexture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/StarShip.png"))
     {
@@ -365,43 +426,7 @@ int main()
         std::cout << "Error loading centipedeBodyTexture texture" << std::endl;
     }
 
-    // run the program as long as the window is open
-    while (window.isOpen())
-    {
-        sf::Texture texture;
-        if (!texture.loadFromFile("/home/ada/6122/Beginning-Cpp-Game-Programming-Second-Edition/Lab1/sprites/startup_screen_background.png"))
-        {
-            std::cout << "No texture found!";
-        }
-
-        // check all the window's events that were triggered since the last iteration of the loop
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window.close();
-            
-            if (event.type == sf::Event::KeyPressed)
-            {
-                if (event.key.code == sf::Keyboard::Enter)
-                {
-                    std::cout << "Enter key pressed" << std::endl;
-                    beginGameSequence(&window, &event);
-                }
-            }
-        }
-
-        // clear the window with black color
-        window.clear(sf::Color::Black);
-
-        sf::Sprite sprite;
-        sprite.setTexture(texture);
-        window.draw(sprite);
-
-        // end the current frame
-        window.display();
-    }
+    homeScreen();
 
     return 0;
 }
