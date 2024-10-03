@@ -18,6 +18,7 @@
 #include "mushroomGameObj.cpp"
 #include "laserGameObj.cpp"
 #include "centipedeGameObj.cpp"
+#include <SFML/Config.hpp>
 
 void homeScreen();
 
@@ -382,7 +383,7 @@ void homeScreen ()
     while (window.isOpen())
     {
         sf::Texture texture;
-        if (!texture.loadFromFile(projectFilePath + "/graphics/startup_screen_background.png"))
+        if (!texture.loadFromFile("graphics/startup_screen_background.png"))
         {
             std::cout << "No texture found!";
         }
@@ -426,7 +427,7 @@ int main()
     srand(time(NULL));
 
     // load fonts and textures
-    if(!font.loadFromFile(projectFilePath + "/graphics/font.ttf"))
+    if(!font.loadFromFile("graphics/graphics/font.ttf"))
     {
         std::cout << "Unable to load font" << std::endl;
     }
